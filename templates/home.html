@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styled Form</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      padding-top: 50px;
+    }
+
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      /* Adjust the width as needed */
+
+    }
+
+    .table,
+    .table {
+      vertical-align: middle;
+    }
+
+    .scrollable-table {
+      overflow-y: auto;
+      max-height: 800px;
+      /* Adjust height as needed */
+    }
+
+    .card-body {
+      max-width: 100%;
+    }
+
+    .form-control {
+      min-width: 200px;
+      /* Adjust the width as needed */
+    }
+
+    #auto-increment {
+      width: 50px;
+      /* Adjust the width as needed */
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="card shadow">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="scrollable-table">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>S No.</th>
+                    <th>Product Name</th>
+                    <th>Delivery Date</th>
+                    <th>Quantity</th>
+                    <th>Uom</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Total Net Price</th>
+                    <th>Sales Price</th>
+                    <th>Net Price</th>
+                    <th>Ratio</th>
+                    <th>Exw Price</th>
+                    <th>Shipping Cost</th>
+                    <th>Customs</th>
+                    <th>Customs%</th>
+                    <th>My Broker</th>
+                    <th>Bank Charges</th>
+                    <th>Obnal</th>
+                    <th>Obnal (%)</th>
+                    <th>Profit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="text" id="auto-increment" class="form-control auto-increment-field" readonly
+                        value="1"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                    <td><input type="text" class="form-control"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <button id="addRowBtn" type="button" class="btn btn-primary ml-4">Add Row</button>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to add a new row to the table
+    function addRow() {
+      var table = document.querySelector('.scrollable-table table tbody');
+      var lastRow = table.rows[table.rows.length - 1]; // Get the last row
+      var newRow = table.insertRow();
+
+      // Copy the value from the previous row's auto-increment field and increment it
+      var autoIncrementField = lastRow.cells[0].querySelector('input').value;
+      var newAutoIncrementValue = parseInt(autoIncrementField) + 1;
+
+      // Insert cells into the new row
+      for (var i = 0; i < lastRow.cells.length; i++) {
+        var newCell = newRow.insertCell(i);
+        if (i === 0) {
+          // If it's the first cell (auto-increment field), insert the new auto-increment value
+          newCell.innerHTML = '<input type="text" class="form-control auto-increment-field" readonly value="' + newAutoIncrementValue + '">';
+        } else {
+          // Otherwise, insert a regular input field
+          newCell.innerHTML = '<input type="text" class="form-control">';
+        }
+      }
+    }
+
+    // Event listener for the button click
+    document.getElementById('addRowBtn').addEventListener('click', addRow);
+  </script>
+
+</body>
+
+</html>
