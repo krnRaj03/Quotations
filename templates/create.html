@@ -1,0 +1,385 @@
+{% include 'nav.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styled Form</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      padding-top: 50px;
+    }
+
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      /* Adjust the width as needed */
+
+    }
+
+    .table,
+    .table {
+      vertical-align: middle;
+    }
+
+    .scrollable-table {
+      overflow-y: auto;
+      max-height: 800px;
+      /* Adjust height as needed */
+    }
+
+    .card-body {
+      max-width: 100%;
+    }
+
+    .form-control {
+      min-width: 200px;
+      /* Adjust the width as needed */
+    }
+
+    .custom-width {
+      width: 30px !important;
+    }
+
+    .custom-field {
+      width: 50px !important;
+      border-radius: 5px;
+    }
+
+    .custom-field1 {
+      width: 100px !important;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="card shadow">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <input type="hidden" id="products_data" name="products_data">
+
+                  <label for="company-name">Company Name</label>
+                  <input type="text" id="company-name" name="company-name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label for="client-name">Client Name</label>
+                  <input type="text" id="client-name" name="client-name" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label for="client-email">Client Email</label>
+                  <input type="text" id="client-email" name="client-email" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label for="quotation-number">Quotation Number</label>
+                  <input type="text" id="quote-no" name="quote-no" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label for="vat">VAT</label>
+                  <input type="text" id="vat" name="vat" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label for="inco-terms">INCO TERMS</label>
+                  <input type="text" id="inco-terms" name="inco-terms" class="form-control">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <label for="shipment-weight">Shipment Weight</label>
+                  <input type="text" id="ship-weight" name="ship-weight" class="form-control">
+                </div>
+
+              </div>
+            </div>
+
+
+            <div class="scrollable-table">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>S No.</th>
+                    <th>Product Name</th>
+                    <th>Delivery Date</th>
+                    <th>Quantity</th>
+                    <th>Uom</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Total Net Price</th>
+                    <th>Sales Price</th>
+                    <th>Net Price</th>
+                    <th>Ratio</th>
+                    <th>Exw Price</th>
+                    <th>Shipping Cost</th>
+                    <th>Customs</th>
+                    <th>Customs%</th>
+                    <th>My Broker</th>
+                    <th>Bank Charges</th>
+                    <th>Obnal</th>
+                    <th>Obnal (%)</th>
+                    <th>Profit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="text" id="auto-increment" class="auto-increment-field custom-width" disabled
+                        value="1"></td>
+                    <td><input type="text" name="product-name" class="form-control"></td>
+                    <td><input type="text" name="delivery-date" class="form-control"></td>
+                    <td><input type="text" name="quantity" class="custom-field" value="1"></td>
+                    <td><input type="text" name="uom" class="custom-field"></td>
+                    <td><input type="text" name="price" class="form-control"></td>
+                    <td><input type="text" name="total" class="form-control"></td>
+                    <td><input type="text" name="total-net-price" class="form-control"></td>
+                    <td><input type="text" name="sales-price" class="form-control"></td>
+                    <td><input type="text" name="net-price" class="form-control"></td>
+                    <td><input type="text" name="ratio" style="width: 50px; border-radius:5px;" value=".10" disabled>
+                    </td>
+                    <td><input type="text" name="exw-price" class="custom-field1"></td>
+                    <td><input type="text" name="shipping-cost" class="custom-field1"></td>
+                    <td><input type="text" name="customs" class="custom-field1"></td>
+                    <td><input type="text" name="customs-percent" class="custom-field1"></td>
+                    <td><input type="text" name="my-broker" class="custom-field1"></td>
+                    <td><input type="text" name="bank-charges" class="custom-field1"></td>
+                    <td><input type="text" name="obnal" class="custom-field1"></td>
+                    <td><input type="text" name="obnal-percent" class="custom-field1"></td>
+                    <td><input type="text" name="profit" class="form-control""></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class=" d-flex justify-content-between">
+                      <div>
+                        <button id="addRowBtn" type="button" class="btn btn-primary ml-4">Add Row</button>
+                      </div>
+                      <div>
+                        <button type="submit" class="btn btn-success ml-4">Save</button>
+                      </div>
+            </div>
+
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      // Function to calculate values
+      function calculateValues() {
+        $('.scrollable-table table tbody tr').each(function () {
+          var row = $(this);
+          var exwPrice = parseFloat(row.find('[name="exw-price"]').val()) || 0;
+          var customsPercent = parseFloat(row.find('[name="customs-percent"]').val()) || 0;
+          var shippingCost = parseFloat(row.find('[name="shipping-cost"]').val()) || 0;
+          var myBroker = parseFloat(row.find('[name="my-broker"]').val()) || 0;
+          var bankCharges = parseFloat(row.find('[name="bank-charges"]').val()) || 0;
+          var obnal = parseFloat(row.find('[name="obnal"]').val()) || 0;
+          var quantity = parseInt(row.find('[name="quantity"]').val()) || 0;
+          var ratio = parseFloat(row.find('[name="ratio"]').val()) || 0;
+
+          // Calculate customs
+          var customs = (customsPercent / 100) * exwPrice;
+          row.find('[name="customs"]').val(customs.toFixed(2));
+
+          // Calculate net price
+          var netPrice = exwPrice + shippingCost + customs + myBroker + bankCharges;
+          row.find('[name="net-price"]').val(netPrice.toFixed(2));
+
+          // Calculate sales price
+          var salesPrice = (ratio * exwPrice) + netPrice;
+          row.find('[name="sales-price"]').val(salesPrice.toFixed(2));
+
+          // Calculate total net price
+          var totalNetPrice = netPrice * quantity;
+          row.find('[name="total-net-price"]').val(totalNetPrice.toFixed(2));
+
+          // Calculate price
+          row.find('[name="price"]').val(salesPrice.toFixed(2));
+
+          // Calculate total
+          var total = salesPrice * quantity;
+          row.find('[name="total"]').val(total.toFixed(2));
+
+          // Calculate profit
+          var profit = total - totalNetPrice - obnal;
+          row.find('[name="profit"]').val(profit.toFixed(2));
+        });
+      }
+
+      // Event listeners for input fields
+      $(document).on('input', '[name="exw-price"], [name="customs-percent"], [name="shipping-cost"], [name="my-broker"], [name="bank-charges"], [name="obnal"], [name="quantity"]', function () {
+        calculateValues();
+      });
+
+
+      // Function to add a new row to the table
+      function addRow() {
+        var table = $('.scrollable-table table tbody');
+        var lastRow = table.find('tr:last');
+        var newRow = lastRow.clone();
+
+        // Increment auto-increment value
+        var autoIncrementField = newRow.find('.auto-increment-field');
+        var newAutoIncrementValue = parseInt(autoIncrementField.val()) + 1;
+        autoIncrementField.val(newAutoIncrementValue);
+
+        // Copy ratio from the previous row
+        var lastRatio = lastRow.find('[name="ratio"]').val();
+        newRow.find('[name="ratio"]').val(lastRatio);
+
+        // Set default quantity to 1
+        newRow.find('[name="quantity"]').val('1');
+
+        // Clear input values except for auto-increment and ratio
+        newRow.find('input[type="text"]').not('.auto-increment-field, [name="ratio"], [name="quantity"]').val('');
+
+        table.append(newRow);
+        calculateValues(); // Recalculate values for the new row
+      }
+
+      // Event listener for the Add Row button click
+      $('#addRowBtn').on('click', function () {
+        addRow();
+      });
+
+      // Form submission handler to serialize product data
+      $('form').submit(function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        var productsData = []; // Initialize or reset the array to ensure it's empty before collecting data
+
+        // Explicitly select and iterate over each row in the table body
+        $('.scrollable-table table tbody tr').each(function () {
+          var row = $(this); // Current row
+          // Collect data from this row
+          var product = {
+            productName: row.find('[name="product-name"]').val(),
+            deliveryDate: row.find('[name="delivery-date"]').val(),
+            quantity: row.find('[name="quantity"]').val(),
+            uom: row.find('[name="uom"]').val(),
+            price: row.find('[name="price"]').val(),
+            total: row.find('[name="total"]').val(),
+            // Add other fields as necessary
+          };
+          productsData.push(product); // Add this row's data to the array
+        });
+
+        // After collecting data from all rows, serialize and set the value of the hidden input
+        $('#products_data').val(JSON.stringify(productsData));
+
+        // Programmatically submit the form
+        this.submit(); // Now it should include data from all rows
+        console.log(productsData);
+      });
+    });
+
+  </script>
+
+  <!-- <script>
+    $(document).ready(function () {
+      // Function to calculate values
+      function calculateValues() {
+        $('.scrollable-table table tbody tr').each(function () {
+          var row = $(this);
+          var exwPrice = parseFloat(row.find('[name="exw-price"]').val()) || 0;
+          var customsPercent = parseFloat(row.find('[name="customs-percent"]').val()) || 0;
+          var shippingCost = parseFloat(row.find('[name="shipping-cost"]').val()) || 0;
+          var myBroker = parseFloat(row.find('[name="my-broker"]').val()) || 0;
+          var bankCharges = parseFloat(row.find('[name="bank-charges"]').val()) || 0;
+          var obnal = parseFloat(row.find('[name="obnal"]').val()) || 0;
+          var quantity = parseInt(row.find('[name="quantity"]').val()) || 0;
+          var ratio = parseFloat(row.find('[name="ratio"]').val()) || 0;
+
+          // Calculate customs
+          var customs = (customsPercent / 100) * exwPrice;
+          row.find('[name="customs"]').val(customs.toFixed(2));
+
+          // Calculate net price
+          var netPrice = exwPrice + shippingCost + customs + myBroker + bankCharges;
+          row.find('[name="net-price"]').val(netPrice.toFixed(2));
+
+          // Calculate sales price
+          var salesPrice = (ratio * exwPrice) + netPrice;
+          row.find('[name="sales-price"]').val(salesPrice.toFixed(2));
+
+          // Calculate total net price
+          var totalNetPrice = netPrice * quantity;
+          row.find('[name="total-net-price"]').val(totalNetPrice.toFixed(2));
+
+          // Calculate price
+          row.find('[name="price"]').val(salesPrice.toFixed(2));
+
+          // Calculate total
+          var total = salesPrice * quantity;
+          row.find('[name="total"]').val(total.toFixed(2));
+
+          // Calculate profit
+          var profit = total - totalNetPrice - obnal;
+          row.find('[name="profit"]').val(profit.toFixed(2));
+        });
+      }
+
+      // Event listeners for input fields
+      $(document).on('input', '[name="exw-price"], [name="customs-percent"], [name="shipping-cost"], [name="my-broker"], [name="bank-charges"], [name="obnal"], [name="quantity"]', function () {
+        calculateValues();
+      });
+
+      // Function to add a new row to the table
+      function addRow() {
+        var table = $('.scrollable-table table tbody');
+        var lastRow = table.find('tr:last');
+        var newRow = lastRow.clone();
+
+        // Increment auto-increment value
+        var autoIncrementField = newRow.find('.auto-increment-field');
+        var newAutoIncrementValue = parseInt(autoIncrementField.val()) + 1;
+        autoIncrementField.val(newAutoIncrementValue);
+
+        // Copy ratio from the previous row
+        var lastRatio = lastRow.find('[name="ratio"]').val();
+        newRow.find('[name="ratio"]').val(lastRatio);
+
+        // Set default quantity to 1
+        var lastQuantity = lastRow.find('[name="quantity"]').val();
+        newRow.find('[name="quantity"]').val(lastQuantity);
+
+        // Clear input values except auto-increment and ratio
+        newRow.find('input[type="text"]').not('.auto-increment-field, [name="ratio"], [name="quantity"]').val('');
+
+        table.append(newRow);
+        calculateValues(); // Calculate values after adding a new row
+      }
+      // Event listener for the button click
+      $('#addRowBtn').on('click', function () {
+        addRow();
+      });
+
+      // Initialize auto-increment value
+      var initialAutoIncrement = 1;
+      $('.auto-increment-field').val(initialAutoIncrement);
+    });
+  </script> -->
+
+</body>
+
+</html>
