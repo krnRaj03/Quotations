@@ -3,8 +3,12 @@ from .views import *
 
 urlpatterns = [
     path('',home,name='home' ),
-    path('create/',create,name='create' ),
     path('nav/',nav,name='nav'),
-    path('pdf/',hello_world_pdf,name='hello_world_pdf'),
-    path('edit/',view_quotation,name='view_quotation'),
+    path('create/',create,name='create' ),
+    path('finalise/<uuid:id>',finalise,name='finalise'),
+    path('edit/<uuid:id>',edit,name='edit'),
+    path('pdf/<uuid:id>',generate_pdf,name='generate_pdf'),
+    path('view-all/',view_all_quotes,name='view_all'),
+    path('quote/details/<uuid:quote_id>/', view_single_quote, name='view_single'),
+
 ]

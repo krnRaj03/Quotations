@@ -7,10 +7,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <!-- Include Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
+  <div style="width:50%;">
+    <canvas id="quotesChart"></canvas>
+  </div>
+  <script>
+    var ctx = document.getElementById('quotesChart').getContext('2d');
+    var quotesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ month_labels | safe }},
+    datasets: [{
+      label: 'Total Quotes by Month',
+      data: {{ quotes_data | safe }},
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 1,
+      barThickness: 50 
+        }]
+      },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+            ticks: {
+            stepSize: 1, // This will force the chart to use only whole numbers
+              precision: 0 // This ensures no fractional part is considered for ticks
+          }
+        }
 
+      }
+    }
+    });
+  </script>
 </body>
+
+</html>
+
 
 </html>

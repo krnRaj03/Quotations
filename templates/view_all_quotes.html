@@ -1,0 +1,94 @@
+{% include 'nav.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- Include Bootstrap CSS for card styling -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Include DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+  <style>
+    /* Add some padding to the container */
+    .container {
+      padding: 20px;
+    }
+
+    /* Style the card */
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h5 class="card-header">Quotations</h5>
+      <div class="card-body">
+        <table id="quoteTable" class="display">
+          <thead>
+            <tr>
+              <th>Quotation Number</th>
+              <th>Company Name</th>
+              <th>Client Name</th>
+              <th>Date Created</th>
+              <th>Actions</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quote in quotes %}
+            <tr>
+              <td>{{ quote.quotation_number }}</td>
+              <td>{{ quote.company_name }}</td>
+              <td>{{ quote.client_name }}</td>
+              <td>{{quote.date_created}}</td>
+              <td>
+                <a href="{% url 'view_single' quote.id %}" class="btn btn-primary">View</a>
+              </td>
+              <td><button class="btn btn-primary" onclick="viewQuotation('{{ quote.id }}')">Generate Invoice</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include DataTables JS -->
+  <script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+  <!-- Include Bootstrap JS for button styling -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('#quoteTable').DataTable({
+        paging: true, // Enable pagination
+        pageLength: 10, // Set items per page
+        lengthChange: false, // Disable length change
+        searching: true, // Enable search
+        ordering: true, // Enable ordering
+        info: true // Enable table information display
+      });
+    });
+
+    function viewQuotation(id) {
+      // Implement your view quotation logic here
+      // You can redirect to a new page or show a modal with quotation details
+      alert("View quotation with ID: " + id);
+    }
+  </script>
+</body>
+
+</html>

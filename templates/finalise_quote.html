@@ -1,0 +1,69 @@
+{% include 'nav.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalize Details</title>
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+
+  <div class="container mt-5">
+    <h1 class="mb-4">Quote Details</h1>
+
+    <div class=" p-3 border rounded shadow mb-4">
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-md-4">
+            <strong>Company Name:</strong> {{ quote.company_name }}
+          </div>
+          <div class="col-md-4">
+            <strong>Client Name:</strong> {{ quote.client_name }}</p>
+          </div>
+          <div class="col-md-4">
+            <strong>Client Email:</strong> {{ quote.client_email }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <strong>Total Price:</strong> {{ quote.total_price }} EUR
+          </div>
+          <div class="col-md-4">
+            <strong>Profit: </strong>{{quote.profit}} EUR
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Products row -->
+    <div class="row">
+      {% for prod in product %}
+      <div class="col-md-4 mb-4">
+        <div class="product-info p-3 border rounded shadow">
+          <p class="product-serial mb-2"><strong>#{{ forloop.counter }}</strong></p>
+          <p class="product-name mb-1"><strong>Product Name:</strong> {{ prod.all_info.productName }}</p>
+          <p class="delivery-date mb-1"><strong>Delivery Date:</strong> {{ prod.all_info.deliveryDate }}</p>
+          <p class="quantity mb-1"><strong>Quantity:</strong> {{ prod.all_info.quantity }}</p>
+          <p class="uom mb-1"><strong>Unit of Measure:</strong> {{ prod.all_info.uom }}</p>
+          <p class="price mb-1"><strong>Price:</strong> ${{ prod.all_info.price }}</p>
+          <p class="total mb-3"><strong>Total:</strong> ${{ prod.all_info.total }}</p>
+          <a href="{% url 'edit' id=quote.id %}" class="btn btn-primary">Edit</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'generate_pdf' id=quote.id %}" class="btn btn-success mb-4">Generate Quote</a>
+  </div>
+
+  <!-- Include Bootstrap JS and its dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

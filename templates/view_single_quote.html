@@ -1,0 +1,91 @@
+{% include 'nav.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Details</title>
+  <!-- Include Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 20px;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      background-color: #fff;
+      border-radius: 5px;
+      padding: 30px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+    }
+
+    .btn-back {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-4 mb-4">
+    <h1>Quote Details</h1>
+    <h2>Quote Information:</h2>
+    <ul>
+      <li><strong>Company Name:</strong> {{ quote.company_name }}</li>
+      <li><strong>Client Name:</strong> {{ quote.client_name }}</li>
+      <li><strong>Client Email:</strong> {{ quote.client_email }}</li>
+      <li><strong>Quotation Number:</strong> {{ quote.quotation_number }}</li>
+      <!-- Add other quote fields as needed -->
+    </ul>
+
+    <h2>Products:</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product Info</th>
+          <th>Quantity</th>
+          <th>UOM</th>
+          <th>Total</th>
+          <th>Delivery Date</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product.all_info.productName }}</td>
+          <td>{{ product.all_info.quantity }}</td>
+          <td>{{ product.all_info.uom }}</td>
+          <td>{{ product.all_info.total }}</td>
+          <td>{{product.all_info.deliveryDate}}</td>
+          <td>{{product.all_info.profit}}</td>
+          <!-- Add other product fields if needed -->
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{% url 'view_all' %}" class="btn btn-primary btn-back">Back</a>
+    <!-- Add link to go back to previous page -->
+  </div>
+  <!-- Include Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

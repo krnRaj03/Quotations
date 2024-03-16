@@ -76,13 +76,21 @@ class Quote(models.Model):
     vat = models.CharField(max_length=50)
     inco_terms = models.CharField(max_length=100)
     shipment_weight = models.CharField(max_length=50)
-
+    shipment_dimensions = models.CharField(max_length=50)
+    pre_tax_total = models.FloatField(default=0.0)
+    total_price = models.FloatField(default=0.0)
+    profit = models.FloatField(default=0.0)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return str(self.id)+" - "+self.client_name
+        return self.quotation_number+" - "+self.client_name
 
 class Product(models.Model):
     quote = models.ForeignKey(Quote, on_delete=models.CASCADE)
     all_info=models.JSONField()
+    total_price = models.FloatField(default=0.0)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.quote.quotation_number

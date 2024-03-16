@@ -69,49 +69,54 @@
         <div class="card-body">
           <form method="post">
             {% csrf_token %}
+            <!-- Quote Information -->
             <div class="form-group">
               <div class="row mb-2">
                 <div class="col-md-6">
                   <input type="hidden" id="products_data" name="products_data">
 
-                  <label for="company-name">Company Name</label>
-                  <input type="text" id="company-name" name="company-name" class="form-control">
+                  <strong for="company-name">Company Name</strong>
+                  <input type="text" id="company-name" name="company-name" class="form-control" required>
                 </div>
+
                 <div class="col-md-6">
-                  <label for="client-name">Client Name</label>
-                  <input type="text" id="client-name" name="client-name" class="form-control">
+                  <strong for="client-name">Client Name</strong>
+                  <input type="text" id="client-name" name="client-name" class="form-control" required>
                 </div>
               </div>
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label for="client-email">Client Email</label>
+                  <strong for="client-email">Client Email</strong>
                   <input type="text" id="client-email" name="client-email" class="form-control">
                 </div>
                 <div class="col-md-6">
-                  <label for="quotation-number">Quotation Number</label>
-                  <input type="text" id="quote-no" name="quote-no" class="form-control">
+                  <strong for="quotation-number">Quotation Number</strong>
+                  <input type="text" id="quote-no" name="quote-no" class="form-control" required>
                 </div>
               </div>
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label for="vat">VAT</label>
-                  <input type="text" id="vat" name="vat" class="form-control">
+                  <strong for="vat">VAT %</strong>
+                  <input type="text" id="vat" name="vat" class="form-control" required>
                 </div>
                 <div class="col-md-6">
-                  <label for="inco-terms">INCO TERMS</label>
-                  <input type="text" id="inco-terms" name="inco-terms" class="form-control">
+                  <strong for="inco-terms">INCO TERMS</strong>
+                  <input type="text" id="inco-terms" name="inco-terms" class="form-control" required>
                 </div>
               </div>
               <div class="row mb-2">
                 <div class="col-md-6">
-                  <label for="shipment-weight">Shipment Weight</label>
-                  <input type="text" id="ship-weight" name="ship-weight" class="form-control">
+                  <strong for="shipment-weight">Shipment Weight</strong>
+                  <input type="text" id="ship-weight" name="ship-weight" class="form-control" required>
                 </div>
-
+                <div class="col-md-6">
+                  <strong for="shipment-dimensions">Shipment Dimensions</strong>
+                  <input type="text" id="ship-dimensions" name="ship-dimensions" class="form-control" required>
+                </div>
               </div>
             </div>
 
-
+            <!-- Product Information -->
             <div class="scrollable-table">
               <table class="table table-bordered">
                 <thead>
@@ -145,12 +150,12 @@
                     <td><input type="text" name="product-name" class="form-control"></td>
                     <td><input type="text" name="delivery-date" class="form-control"></td>
                     <td><input type="text" name="quantity" class="custom-field" value="1"></td>
-                    <td><input type="text" name="uom" class="custom-field"></td>
-                    <td><input type="text" name="price" class="form-control"></td>
-                    <td><input type="text" name="total" class="form-control"></td>
-                    <td><input type="text" name="total-net-price" class="form-control"></td>
-                    <td><input type="text" name="sales-price" class="form-control"></td>
-                    <td><input type="text" name="net-price" class="form-control"></td>
+                    <td><input type="text" name="uom" class="custom-field" required></td>
+                    <td><input type="text" name="price" class="custom-field1"></td>
+                    <td><input type="text" name="total" class="custom-field1"></td>
+                    <td><input type="text" name="total-net-price" class="custom-field1"></td>
+                    <td><input type="text" name="sales-price" class="custom-field1"></td>
+                    <td><input type="text" name="net-price" class="custom-field1"></td>
                     <td><input type="text" name="ratio" style="width: 50px; border-radius:5px;" value=".10" disabled>
                     </td>
                     <td><input type="text" name="exw-price" class="custom-field1"></td>
@@ -161,7 +166,7 @@
                     <td><input type="text" name="bank-charges" class="custom-field1"></td>
                     <td><input type="text" name="obnal" class="custom-field1"></td>
                     <td><input type="text" name="obnal-percent" class="custom-field1"></td>
-                    <td><input type="text" name="profit" class="form-control""></td>
+                    <td><input type="text" name="profit" class="custom-field1""></td>
                   </tr>
                 </tbody>
               </table>
@@ -227,7 +232,7 @@
       }
 
       // Event listeners for input fields
-      $(document).on('input', '[name="exw-price"], [name="customs-percent"], [name="shipping-cost"], [name="my-broker"], [name="bank-charges"], [name="obnal"], [name="quantity"]', function () {
+      $(document).on('input', '[name="exw-price"], [name="customs-percent"], [name="shipping-cost"], [name="my-broker"], [name="bank-charges"], [name="obnal"], [name="quantity"], [name="profit"]', function () {
         calculateValues();
       });
 
@@ -266,9 +271,9 @@
       $('form').submit(function (e) {
         e.preventDefault(); // Prevent the default form submission
 
-        var productsData = []; // Initialize or reset the array to ensure it's empty before collecting data
+        var productsData = []; // Initialize array to collect data
 
-        // Explicitly select and iterate over each row in the table body
+        //  select and iterate each row in the table body
         $('.scrollable-table table tbody tr').each(function () {
           var row = $(this); // Current row
           // Collect data from this row
@@ -279,12 +284,13 @@
             uom: row.find('[name="uom"]').val(),
             price: row.find('[name="price"]').val(),
             total: row.find('[name="total"]').val(),
-            // Add other fields as necessary
+            profit: row.find('[name="profit"]').val(),
+
           };
-          productsData.push(product); // Add this row's data to the array
+          productsData.push(product); // Add row's data to array
         });
 
-        // After collecting data from all rows, serialize and set the value of the hidden input
+        // serialize and set the value of the hidden input
         $('#products_data').val(JSON.stringify(productsData));
 
         // Programmatically submit the form
