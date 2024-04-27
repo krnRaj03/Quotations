@@ -7,7 +7,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <!-- Include Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -35,8 +34,8 @@
         y: {
           beginAtZero: true,
             ticks: {
-            stepSize: 1, // This will force the chart to use only whole numbers
-              precision: 0 // This ensures no fractional part is considered for ticks
+            stepSize: 1,
+              precision: 0
           }
         }
 
@@ -50,3 +49,53 @@
 
 
 </html>
+
+
+<!-- {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <h1>Quotation & Invoicing System</h1>
+  <style>
+    body {
+      background-color: white;
+      text-align: center;
+      font-family: Arial, sans-serif;
+
+    }
+
+    img {
+      max-width: 200px;
+      height: auto;
+      margin: 20px 0;
+      /* Adjust the margin as needed */
+    }
+
+    .header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 50px;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="logo-container">
+    <img src="{% static 'assets/avista.png' %}" alt="Avista Logo">
+    <img src="{% static 'assets/megahertz.png' %}" alt="Megahertz Logo">
+  </div>
+</body>
+
+</html> -->

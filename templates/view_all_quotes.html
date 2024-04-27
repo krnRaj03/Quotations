@@ -7,9 +7,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <!-- Include Bootstrap CSS for card styling -->
+  <!-- Bootstrap CSS for card styling -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <!-- Include DataTables CSS -->
+  <!-- DataTables CSS -->
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 
   <style>
@@ -53,7 +53,9 @@
               <td>
                 <a href="{% url 'view_single' quote.id %}" class="btn btn-primary">View</a>
               </td>
-              <td><button class="btn btn-primary" onclick="viewQuotation('{{ quote.id }}')">Generate Invoice</button>
+
+              <td>
+                <a href="{% url 'delete_quote' quote.id %}" class="btn btn-danger">Delete</a>
               </td>
             </tr>
             {% endfor %}
@@ -63,12 +65,12 @@
     </div>
   </div>
 
-  <!-- Include jQuery -->
+  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Include DataTables JS -->
+  <!-- DataTables JS -->
   <script type="text/javascript" charset="utf8"
     src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-  <!-- Include Bootstrap JS for button styling -->
+  <!-- Bootstrap -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
   <script>
@@ -84,8 +86,6 @@
     });
 
     function viewQuotation(id) {
-      // Implement your view quotation logic here
-      // You can redirect to a new page or show a modal with quotation details
       alert("View quotation with ID: " + id);
     }
   </script>

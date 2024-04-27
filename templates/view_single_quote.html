@@ -11,11 +11,6 @@
   <!-- Include Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      padding-top: 20px;
-      background-color: #f8f9fa;
-    }
-
     .container {
       background-color: #fff;
       border-radius: 5px;
@@ -44,13 +39,20 @@
 
 <body>
   <div class="container mt-4 mb-4">
-    <h1>Quote Details</h1>
+
     <h2>Quote Information:</h2>
+    <div class="text-end">
+      <a href="{% url 'finalise_invoice' quote.id %}" class="btn btn-success">Create Invoice</a>
+    </div>
+
+
     <ul>
       <li><strong>Company Name:</strong> {{ quote.company_name }}</li>
       <li><strong>Client Name:</strong> {{ quote.client_name }}</li>
       <li><strong>Client Email:</strong> {{ quote.client_email }}</li>
       <li><strong>Quotation Number:</strong> {{ quote.quotation_number }}</li>
+      <li><strong>Quotation Date:</strong> {{ quote.date_created }}</li>
+      <li><strong>Profit:</strong> {{quote.profit}}EUR</li>
       <!-- Add other quote fields as needed -->
     </ul>
 
@@ -81,7 +83,10 @@
       </tbody>
     </table>
 
-    <a href="{% url 'view_all' %}" class="btn btn-primary btn-back">Back</a>
+    <!-- <a href="{% url 'view_all' %}" class="btn btn-primary btn-back text-end">Back</a> -->
+    <div class="text-end">
+      <a href="{% url 'view_all' %}" class="btn btn-primary text-end">Back</a>
+    </div>
     <!-- Add link to go back to previous page -->
   </div>
   <!-- Include Bootstrap JS -->

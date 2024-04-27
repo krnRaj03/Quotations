@@ -94,3 +94,20 @@ class Product(models.Model):
 
     def __str__(self):
         return self.quote.quotation_number
+
+class InvoiceModel (models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=50,null=True)
+    purchase_order = models.CharField(max_length=50,null=True)
+    invoice_date = models.CharField(max_length=50, null=True)
+    bank_details = models.CharField(max_length=2000)
+    seller_name = models.CharField(max_length=200)
+    buyer_name = models.CharField(max_length=200)
+    director_name = models.CharField(max_length=100)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.invoice_number) +"-"+ str(self.quote.quotation_number) 
+

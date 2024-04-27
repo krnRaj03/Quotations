@@ -21,8 +21,6 @@
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
       width: 100%;
-      /* Adjust the width as needed */
-
     }
 
     .table,
@@ -300,91 +298,6 @@
     });
 
   </script>
-
-  <!-- <script>
-    $(document).ready(function () {
-      // Function to calculate values
-      function calculateValues() {
-        $('.scrollable-table table tbody tr').each(function () {
-          var row = $(this);
-          var exwPrice = parseFloat(row.find('[name="exw-price"]').val()) || 0;
-          var customsPercent = parseFloat(row.find('[name="customs-percent"]').val()) || 0;
-          var shippingCost = parseFloat(row.find('[name="shipping-cost"]').val()) || 0;
-          var myBroker = parseFloat(row.find('[name="my-broker"]').val()) || 0;
-          var bankCharges = parseFloat(row.find('[name="bank-charges"]').val()) || 0;
-          var obnal = parseFloat(row.find('[name="obnal"]').val()) || 0;
-          var quantity = parseInt(row.find('[name="quantity"]').val()) || 0;
-          var ratio = parseFloat(row.find('[name="ratio"]').val()) || 0;
-
-          // Calculate customs
-          var customs = (customsPercent / 100) * exwPrice;
-          row.find('[name="customs"]').val(customs.toFixed(2));
-
-          // Calculate net price
-          var netPrice = exwPrice + shippingCost + customs + myBroker + bankCharges;
-          row.find('[name="net-price"]').val(netPrice.toFixed(2));
-
-          // Calculate sales price
-          var salesPrice = (ratio * exwPrice) + netPrice;
-          row.find('[name="sales-price"]').val(salesPrice.toFixed(2));
-
-          // Calculate total net price
-          var totalNetPrice = netPrice * quantity;
-          row.find('[name="total-net-price"]').val(totalNetPrice.toFixed(2));
-
-          // Calculate price
-          row.find('[name="price"]').val(salesPrice.toFixed(2));
-
-          // Calculate total
-          var total = salesPrice * quantity;
-          row.find('[name="total"]').val(total.toFixed(2));
-
-          // Calculate profit
-          var profit = total - totalNetPrice - obnal;
-          row.find('[name="profit"]').val(profit.toFixed(2));
-        });
-      }
-
-      // Event listeners for input fields
-      $(document).on('input', '[name="exw-price"], [name="customs-percent"], [name="shipping-cost"], [name="my-broker"], [name="bank-charges"], [name="obnal"], [name="quantity"]', function () {
-        calculateValues();
-      });
-
-      // Function to add a new row to the table
-      function addRow() {
-        var table = $('.scrollable-table table tbody');
-        var lastRow = table.find('tr:last');
-        var newRow = lastRow.clone();
-
-        // Increment auto-increment value
-        var autoIncrementField = newRow.find('.auto-increment-field');
-        var newAutoIncrementValue = parseInt(autoIncrementField.val()) + 1;
-        autoIncrementField.val(newAutoIncrementValue);
-
-        // Copy ratio from the previous row
-        var lastRatio = lastRow.find('[name="ratio"]').val();
-        newRow.find('[name="ratio"]').val(lastRatio);
-
-        // Set default quantity to 1
-        var lastQuantity = lastRow.find('[name="quantity"]').val();
-        newRow.find('[name="quantity"]').val(lastQuantity);
-
-        // Clear input values except auto-increment and ratio
-        newRow.find('input[type="text"]').not('.auto-increment-field, [name="ratio"], [name="quantity"]').val('');
-
-        table.append(newRow);
-        calculateValues(); // Calculate values after adding a new row
-      }
-      // Event listener for the button click
-      $('#addRowBtn').on('click', function () {
-        addRow();
-      });
-
-      // Initialize auto-increment value
-      var initialAutoIncrement = 1;
-      $('.auto-increment-field').val(initialAutoIncrement);
-    });
-  </script> -->
 
 </body>
 
