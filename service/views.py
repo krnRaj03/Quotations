@@ -4,12 +4,11 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-import datetime
 from .models import Quote, Product, InvoiceModel
 from decimal import Decimal
-import json
+import json,datetime
 from django.db.models.functions import TruncMonth
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
@@ -29,13 +28,32 @@ def home(request):
         .annotate(total=Count('id'))
         .order_by('month')
     )
+    profit_per_month = (
+        Quote.objects
+        .annotate(month=TruncMonth('date_created'))
+        .values('month')
+        .annotate(total_profit=Sum('profit'))
+        .order_by('month')
+    )
+
+    invoices_per_month = (
+        InvoiceModel.objects
+        .annotate(month=TruncMonth('date_created'))
+        .values('month')
+        .annotate(total=Count('id'))
+        .order_by('month')
+    )
 
     month_labels = [quote['month'].strftime('%B') for quote in quotes_per_month]
     quotes_data = [quote['total'] for quote in quotes_per_month]
+    invoices_data = [invoice['total'] for invoice in invoices_per_month]
+    profit_data = [profit['total_profit'] for profit in profit_per_month]
 
     context = {
         'month_labels': json.dumps(month_labels, cls=DjangoJSONEncoder),
         'quotes_data': json.dumps(quotes_data, cls=DjangoJSONEncoder),
+        'invoices_data': json.dumps(invoices_data, cls=DjangoJSONEncoder),
+        'profit_data': json.dumps(profit_data, cls=DjangoJSONEncoder),
     }
     return render(request, "home.html", context)
 
@@ -44,7 +62,6 @@ def create_quote(request):
     total_sum = 0
     total_profit=0  
     if request.method == 'POST':
-        # Extract and save the Quote information
         generate_quote = Quote(
             company_name=request.POST.get('company-name'),
             client_name=request.POST.get('client-name'),
@@ -55,14 +72,14 @@ def create_quote(request):
             shipment_weight=request.POST.get('ship-weight'),
             shipment_dimensions=request.POST.get('ship-dimensions'),
         )
+        if Quote.objects.filter(quotation_number=generate_quote.quotation_number):
+            return HttpResponse ("Quotation number already exists")
+        
         generate_quote.save()
 
-        generate_invoice= InvoiceModel(quote=generate_quote)
-        generate_invoice.save()
-
-        # Assuming you're sending Products data as a list of JSON strings for each row
+        # Products data as a list of JSON  for each row
         products_data = json.loads(request.POST.get('products_data'))  # Make sure to include a hidden input in your form that contains this JSON data
-        
+
         for product_info in products_data:
             total = product_info.get('total')
             total1=product_info.get('profit')
@@ -79,14 +96,13 @@ def create_quote(request):
         generate_quote.profit=total_profit
         generate_quote.save()
 
-        # Calculate VAT if applicable
+        # Calculate VAT 
         vat_rate = request.POST.get('vat', 0)
-         # Default to 0 if not found
-        if vat_rate:  # Check if vat_rate is not None or an empty string
+        if vat_rate:  
             vat_rate = float(vat_rate)
-            if vat_rate > 0:  # Check if VAT is greater than 0
+            if vat_rate > 0: 
                 vat_amount = total_sum * (vat_rate / 100)
-                total_sum += vat_amount  # Add VAT to total_sum
+                total_sum += vat_amount  
 
         # Update total price
         generate_quote.total_price = total_sum
@@ -94,56 +110,80 @@ def create_quote(request):
 
         return redirect('finalise_quotation', id=generate_quote.id)
 
-    return render(request, 'create_quote.html')
+    return render(request, 'quotes/create_quote.html')
 
 
 def finalise_quotation(request,id):
     quote = Quote.objects.get(id=id)
     product=Product.objects.filter(quote=quote)
-    if Product.objects.filter(quote=quote).exists():
-        return HttpResponse("Quote exists")
-
+    
     context = {"quote":quote,"product":product}
-    return render(request, "finalise_quote.html", context)
+    return render(request, "quotes/finalise_quote.html", context)
 
 
-def edit(request, id):
+def edit_quotation(request, id):
     quote = Quote.objects.get(id=id)
-    product=Product.objects.filter(quote=quote)
-    for p in product:
-        print(p.all_info)
-    context = {"quote":quote,"product":product}
+    products=Product.objects.filter(quote=quote)
 
-    print(product)
-    return render(request, "edit_quote.html", context)
+    if request.method == 'POST':
+        # Update Quote
+        quote.company_name = request.POST.get('company_name')
+        quote.client_name = request.POST.get('client_name')
+        quote.client_email = request.POST.get('client_email')
+        quote.total_price = request.POST.get('total_price', 0.0)
+        quote.profit = request.POST.get('profit', 0.0)
+        quote.vat = request.POST.get('vat')
+        quote.inco_terms = request.POST.get('inco_terms')
+        quote.shipment_weight = request.POST.get('shipment_weight')
+        quote.save()
+
+        # Update Product 
+    products_json = request.POST.get('products_json')
+    if products_json:
+        products_data = json.loads(products_json)
+        for product_info in products_data:
+            product_id = product_info.get('id')
+            if product_id:
+                product = Product.objects.get(id=product_id)
+                product.all_info = {
+                    'productName': product_info.get('productName'),
+                    'deliveryDate': product_info.get('deliveryDate'),
+                    'quantity': product_info.get('quantity'),
+                    'uom': product_info.get('uom'),
+                    'price': product_info.get('price'),
+                    'total': product_info.get('total')
+                }
+                product.save()
+        return redirect('view_all')  # Redirect after POST
+
+    return render(request, 'quotes/edit_quote.html', {'quote': quote, 'products': products})
 
 
 def view_all_quotes(request):
     get_quotations = Quote.objects.all()
    
     context = {"quotes":get_quotations}
-    return render(request, "view_all_quotes.html", context)
+    return render(request, "quotes/view_all_quotes.html", context)
 
 
 def view_single_quote(request, quote_id):
-    # Retrieve the quote object based on the provided quote_id
     quote = Quote.objects.get(id=quote_id)
-    products = quote.product_set.all()  # Fetch related products for the quote
+    products = quote.product_set.all()  
     
-    return render(request, 'view_single_quote.html', {'quote': quote, 'products': products})
+    return render(request, 'quotes/view_single_quote.html', {'quote': quote, 'products': products})
 
 
 def view_all_invoices(request):
-    get_invoices = InvoiceModel.objects.all()
-    context = {"invoices":get_invoices}
-    return render(request, "view_all_invoices.html", context)
+    invoices = InvoiceModel.objects.all()
+    context = {"invoices":invoices}
+    return render(request, "invoices/view_all_invoices.html", context)
 
 
 def finalise_invoice(request,id):
     quote = Quote.objects.get(id=id)
     product=Product.objects.filter(quote=quote)
 
-    # Define account details
+    # Account details
     account_options = [
             {
                 'value': 'AZ77PAHA40060AZNHC0100067812 - AVISTA MMC',
@@ -201,12 +241,24 @@ def finalise_invoice(request,id):
                                         purchase_order=purchase_order,invoice_date=invoice_date,
                                         bank_details=selected_details,seller_name=seller_name,
                                         buyer_name=buyer_name,director_name=director_name)
-        invoice.save()                                        
+        invoice.save()
+        return redirect('create_invoice', id=quote.id)
+           
+
     context = {"quote":quote,"product":product,"account_options": account_options}
-    return render(request, "finalise_invoice.html", context)
+    return render(request, "invoices/finalise_invoice.html", context)
 
 
 def create_invoice(request, id):
+    quote = Quote.objects.get(id=id)
+    product=Product.objects.filter(quote=quote)
+    invoice = InvoiceModel.objects.get(quote=quote)
+    bank_details_str = invoice.bank_details
+    context = {"quote":quote,"product":product,"invoice":invoice,"bank_details_str":bank_details_str}
+    return render(request, "invoices/create_invoice.html",context)
+
+
+def invoice_pdf(request, id):
     quote = Quote.objects.get(id=id)
     product=Product.objects.filter(quote=quote)
     invoice = InvoiceModel.objects.get(quote=quote)
@@ -233,7 +285,7 @@ def create_invoice(request, id):
         (80, 660, "Alış Sifarişi | Purchase Order | Заказ №:"+"         "+ invoice.purchase_order),
     ]
 
-    padding = 5  # Padding around text for the rectangle
+    padding = 5  # Padding around text for rectangle
     line_width=1.5
     for x, y, text in details:
         text_width = p.stringWidth(text, "Arial", 10)
@@ -249,15 +301,15 @@ def create_invoice(request, id):
     ("Qiymət\nPrice\nЦена", 380),
     ("Toplam\nTotal\nСумма", 430)
         ]
-    x_start = 80  # Starting x position for the rectangle
-    y_start = 632  # Top y position for the first line of text
+    x_start = 80  # Start rectangle
+    y_start = 632 
     font_name = "Arial"
     font_size = 9
-    line_height = 12  # Line height for text spacing
+    line_height = 12  
 
     p.setFont(font_name, font_size)
 
-    # Calculate maximum dimensions needed for the rectangle
+    # Calculate dimensions for rectangle
     max_height = max(text.count('\n') + 1 for text, _ in texts) * line_height
     max_width = 0
     for text, offset in texts:
@@ -368,6 +420,7 @@ def create_invoice(request, id):
 
     p.showPage()
     p.save()
+    print("PDF created")
     return response
 
 
@@ -377,27 +430,30 @@ def create_quotation(request,id):
     pre_tax_total=format(quote.pre_tax_total, '.2f')
     vat=quote.vat
     quote_no=quote.quotation_number
-    product=Product.objects.filter(quote=quote)
+    products=Product.objects.filter(quote=quote)
+    for product in products:
+        coo=product.all_info.get('coo')
+        hs_code=product.all_info.get('hsCode')
     
-    # Create PDF object directly.
+    
+    #PDF object 
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = 'inline; filename=f"{quote_no}.pdf"'
     pdfmetrics.registerFont(TTFont("Arial", "C:/Windows/Fonts/Arial.ttf"))
     pdfmetrics.registerFont(TTFont("Arial-Bold", "Arialbd.ttf"))
 
-    # Create PDF object
     p = canvas.Canvas(response)
     def check_page(y, font_name="Arial", font_size=10):
-        if y < 100:  # Threshold for adding a new page, adjust as needed
+        if y < 100:  # Threshold for adding a new page
             p.showPage()
             p.setFont(font_name, font_size)
-            return 800  # Reset y to the top of the new page
+            return 800  # Reset y to the top 
         return y
 
-    # Set the font size
+  
     font_size = 10
     p.setFont("Arial", font_size)
-    p.drawString(60, 800, "https://bakustock.com")
+    p.drawString(60, 800, "www.bakustock.com")
     p.drawString(60, 788, "Tel: 050 406 30 77")
 
     font_size = 14
@@ -433,7 +489,7 @@ def create_quotation(request,id):
     p.drawString(330, 644, "Sorğu № | RFQ № | № Зaproca:")
     p.drawString(490, 644, "email")
 
-    p.line(50, 610, 540, 610)  # Draws a line from (250, 790) to (400, 790)
+    p.line(50, 610, 540, 610)  
     p.drawString(70, 585, "№")
     p.drawString(100, 595, "Malların-Xidmətlərin təsviri")
     p.drawString(310, 595, "Çatdırılma")
@@ -455,20 +511,23 @@ def create_quotation(request,id):
     p.drawString(410, 575, "Единица")
     p.drawString(460, 575, "Цена")
     p.drawString(500, 575, "Сумма")
-    p.line(50, 565, 540, 565)  # Draws a line from (250, 790) to (400, 790)
+    p.line(50, 565, 540, 565)  # Horizontal line
+
 
     # Products
     y = 540
     font_size = 8
     p.setFont("Arial", font_size)  # Initial y-coordinate for products
-    for i, prod in enumerate(product):
+    for i, prod in enumerate(products):
         p.drawString(70, y, str(i + 1))
         p.drawString(100, y, prod.all_info['productName'])
-        LINE_HEIGHT = 9  # Define your line height
+        LINE_HEIGHT = 9  
         delivery_date = prod.all_info['deliveryDate']
+        if hs_code and coo:
+            p.drawString(100, y- LINE_HEIGHT,f"COO: {prod.all_info['coo']}    HS Code: {prod.all_info['hsCode']}")
         if len(delivery_date) > 10:
             first_line = delivery_date[:13]
-            second_line = delivery_date[13:26]  # Adjust the index to exclude the characters already used in the first line
+            second_line = delivery_date[13:26]  
             third_line = delivery_date[26:]
             p.drawString(310, y, first_line)
             p.drawString(310, y - LINE_HEIGHT, second_line)
@@ -479,9 +538,9 @@ def create_quotation(request,id):
         p.drawString(410, y, prod.all_info['uom'])
         p.drawString(460, y, prod.all_info['price'])
         p.drawString(500, y, prod.all_info['total'])
-        y -= 35  # Move to the next line
+        y -= 35  
 
-    y -= 10  # Extra spacing before the notes section
+    y -= 10  
 
     # NOTES Section
     p.setFillColor(colors.red)
@@ -490,26 +549,26 @@ def create_quotation(request,id):
     p.drawString(100, y, "NOTE: Although AVISTA LLC is an authorized distributor of Ingersol Rand, ")
     y -= 10
     p.drawString(100, y, "it is not responsible for delays in delivery cause by Ingersoll Rand.")
-    y -= 20  # Adjust y as needed for the next piece of content
+    y -= 20  
 
     # Other Sections
     p.setFillColor(colors.black)
     font_size = 8
-    # Here, adjust the fixed y positions to the new dynamic y value as needed
-    p.line(240, y, 540, y)  # Adjusts the y position for the line dynamically
+   
+    p.line(240, y, 540, y) 
     y -= 12  
     p.drawString(260, y, "Ümumi məbləğ ƏDV-siz | Total net value excl TAX | Всего без НДС:")
     p.drawString(500, y, pre_tax_total)
-    y -= 12  # Adjusts space for the next line of text
+    y -= 12  
     p.drawString(426, y, "ƏDV | VAT | НДС:")
     p.drawString(500, y, f'{vat}%')
-    y -= 12  # Adjusts space for the next line of text
+    y -= 12 
     p.drawString(398, y, "ÜMUMİ | TOTAL | ВСЕГО:")
     p.drawString(500, y, total_price)
-    y -= 6  # Adjusts space before drawing the final line
-    p.line(240, y, 540, y)  # Adjusts the y position for the final line dynamically
+    y -= 6  
+    p.line(240, y, 540, y) 
     y = check_page(y, "Arial", 9)
-    y -= 20  # Adjust this value as needed to ensure proper spacing from the previous content
+    y -= 20  
     y = check_page(y, "Arial", 9)
     y-=20
 
@@ -517,26 +576,26 @@ def create_quotation(request,id):
     font_size = 9
     p.setFont("Arial-Bold", font_size)
     p.drawString(70, y, "INCOTERMS şərtləri | INCOTERMS | Условия INCOTERMS:")
-    y -= 10  # Adjust for space between header and details
+    y -= 10  
 
     font_size = 8
     p.setFont("Arial", font_size)
     p.drawString(100, y - 2, quote.inco_terms)
     p.drawString(100, y - 12, "Certificate of Origin will be provided if applicable:")
     p.drawString(100, y - 22, "Certificate of Conformity on AVISTA's letterhead will be provided upon request")
-    y -= 40  # Adjust y after INCOTERMS details
+    y -= 40  
 
     # WEIGHT & DIMENSIONS Section
     font_size = 9
     p.setFont("Arial-Bold", font_size)
     p.drawString(70, y, "Çəki və ölçülər | Weight and dimensions | Вес и размеры:")
-    y -= 10  # Space between header and details
+    y -= 10 
 
     font_size = 8
     p.setFont("Arial", font_size)
     p.drawString(100, y - 2, f"Shipment Net Weight [approximate]: {quote.shipment_weight}")
     p.drawString(100, y - 12, f"Shipment dimensions [approximate]: {quote.shipment_dimensions}")
-    y -= 30  # Adjust y after WEIGHT & DIMENSIONS details
+    y -= 30  
 
     # PAYMENT TERMS Section
     font_size = 9
@@ -550,20 +609,19 @@ def create_quotation(request,id):
     p.drawString(100, y - 12, "In case of exceptional market price increases AVISTA will be entitled to change offered prices within the validity period")
     p.drawString(100, y - 22, "In case of submitting VAT Exemption Certificates 18% VAT will not be charged. In all other cases 18% VAT will be added upon invoicing")
     p.drawString(100, y - 32, "AVISTA is not charging with VAT for the exported goods and services.")
-    y -= 50  # Adjust y after PAYMENT TERMS details
+    y -= 50  
 
     # OTHER TERMS Section
     font_size = 9
     p.setFont("Arial-Bold", font_size)
     p.drawString(70, y, "Digər şərtlər | Other terms | Иные условия:")
-    y -= 10  # Space between header and details
+    y -= 10 
 
     font_size = 8
     p.setFont("Arial", font_size)
     p.drawString(100, y - 2, "Availability in stock at the time of issuing PO must be checked with AVISTA")
     p.drawString(100, y - 12, "Days/Weeks means business days/weeks. Holidays and weekends exclusive.")
     p.drawString(100, y - 22, "AVISTA is not responsible If the buyer selects and orders wrong part number(s) without consulting with AVISTA")
-    # Adjust 'y' if you have more sections to add or if this is the end
 
     p.showPage()
     p.save()

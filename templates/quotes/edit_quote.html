@@ -1,0 +1,150 @@
+{% include 'nav.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Quote</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <div class="card shadow-lg" style="border-radius: 5px;">
+      <form method="post" id="quoteForm">
+        {% csrf_token %}
+        <div class="card-body">
+          <!-- CLIENT DETAILS -->
+          <h3 style="color: crimson;">Client Details</h3>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <h5 class="card-title">Company Name:</h5>
+                <input type="text" name="company_name" class="form-control" value="{{ quote.company_name }}">
+              </div>
+              <div class="col-md-4">
+                <h5 class="card-title">Client Name:</h5>
+                <input type="text" name="client_name" class="form-control" value="{{ quote.client_name }}">
+              </div>
+              <div class="col-md-4">
+                <h5 class="card-title">Client Email:</h5>
+                <input type="text" name="client_email" class="form-control" value="{{ quote.client_email }}">
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-md-4">
+                <h5 class="card-title">Total Price:</h5>
+                <input type="text" name="total_price" class="form-control" value="{{ quote.total_price }}">
+              </div>
+              <div class="col-md-4">
+                <h5 class="card-title">Profit:</h5>
+                <input type="text" name="profit" class="form-control" value="{{ quote.profit }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- INCO TERMS -->
+          <h3 style="color: crimson;">INCO Terms</h3>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <h5 class="card-title">Inco terms:</h5>
+                <input type="text" name="inco_terms" class="form-control" value="{{ quote.inco_terms }}">
+              </div>
+              <div class="col-md-4">
+                <h5 class="card-title">VAT:</h5>
+                <input type="text" name="vat" class="form-control" value="{{ quote.vat }} ">
+              </div>
+              <div class="col-md-4">
+                <h5 class="card-title">Weight:</h5>
+                <input type="text" name="shipment_weight" class="form-control" value="{{ quote.shipment_weight }}">
+              </div>
+            </div>
+          </div>
+
+          <!-- PRODUCT DETAILS -->
+          <h3 style="color: crimson;">Product Details</h3>
+          <div class="row" id="productContainer">
+            {% for prod in products %}
+            <div class="col-md-6 product-item">
+              <div class="card mt-3 shadow-sm">
+                <div class="card-body">
+                  <input type="hidden" class="form-control product-id" value="{{ prod.id }}">
+
+                  <ul>
+                    <li><strong>Product Name:</strong><input type="text" class="form-control productName"
+                        value="{{ prod.all_info.productName }}"></li>
+                    <li><strong>Delivery Date:</strong><input type="text" class="form-control deliveryDate"
+                        value="{{ prod.all_info.deliveryDate }}"></li>
+                    <li><strong>Quantity:</strong><input type="number" class="form-control quantity"
+                        value="{{ prod.all_info.quantity }}"></li>
+                    <li><strong>Unit of Measure:</strong><input type="text" class="form-control uom"
+                        value="{{ prod.all_info.uom }}"></li>
+                    <li><strong>Price:</strong><input type="text" class="form-control price"
+                        value="{{ prod.all_info.price }}"></li>
+                    <li><strong>Total:</strong><input type="text" class="form-control total"
+                        value="{{ prod.all_info.total }}"></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="products_json" id="productsJson">
+          <button type="button" onclick="submitForm()" class="btn btn-primary mt-4"
+            style="margin-left:950px;">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function submitForm() {
+      var products = [];
+      $('#productContainer .product-item').each(function () {
+        var $item = $(this);
+        products.push({
+          id: $item.find('.product-id').val(),  // Collecting the hidden ID
+          productName: $item.find('.productName').val(),
+          deliveryDate: $item.find('.deliveryDate').val(),
+          quantity: $item.find('.quantity').val(),
+          uom: $item.find('.uom').val(),
+          price: $item.find('.price').val(),
+          total: $item.find('.total').val()
+        });
+      });
+
+      $('#productsJson').val(JSON.stringify(products));  // Store the JSON data in a hidden field
+      $('#quoteForm').submit();  // Submit the form
+    }
+  </script>
+  <!-- <script>
+    function collectProductData() {
+      var products = [];
+      $('#productContainer .product-item').each(function () {
+        var $item = $(this);
+        products.push({
+          id: $item.find('.product-id').val(),
+          all_info: {
+            productName: $item.find('.productName').val(),
+            deliveryDate: $item.find('.deliveryDate').val(),
+            quantity: $item.find('.quantity').val(),
+            uom: $item.find('.uom').val(),
+            price: $item.find('.price').val(),
+            total: $item.find('.total').val(),
+          }
+        });
+      });
+      return JSON.stringify(products);
+    }
+
+    function submitForm() {
+      $('#productsJson').val(collectProductData());
+      $('#quoteForm').submit();
+    }
+  </script> -->
+</body>
+
+</html>

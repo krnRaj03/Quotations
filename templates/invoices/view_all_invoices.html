@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>All Invoices</title>
   <!-- Bootstrap CSS for card styling -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <!-- DataTables CSS -->
@@ -30,32 +30,34 @@
 <body>
   <div class="container">
     <div class="card">
-      <h5 class="card-header">Quotations</h5>
+      <h5 class="card-header">Invoices</h5>
       <div class="card-body">
         <table id="quoteTable" class="display">
           <thead>
             <tr>
-              <th>Quotation Number</th>
-              <th>Company Name</th>
-              <th>Client Name</th>
-              <th>Date Created</th>
+              <th>Invoice Number</th>
+              <th>Purchase Order</th>
+              <th>Invoice Date</th>
+              <th>Seller Name</th>
+              <th>Buyer Name</th>
               <th>Actions</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for quote in quotes %}
+            {% for i in invoices %}
             <tr>
-              <td>{{ quote.quotation_number }}</td>
-              <td>{{ quote.company_name }}</td>
-              <td>{{ quote.client_name }}</td>
-              <td>{{quote.date_created}}</td>
+              <td>{{ i.invoice_number }}</td>
+              <td>{{ i.purchase_order }}</td>
+              <td>{{ i.invoice_date }}</td>
+              <td>{{ i.seller_name}}</td>
+              <td>{{ i.buyer_name }}</td>
               <td>
-                <a href="{% url 'view_single' quote.id %}" class="btn btn-primary">View</a>
+                <a href="" class="btn btn-primary">View</a>
               </td>
 
               <td>
-                <a href="{% url 'delete_quote' quote.id %}" class="btn btn-danger">Delete</a>
+                <a href="" class="btn btn-danger">Delete</a>
               </td>
             </tr>
             {% endfor %}

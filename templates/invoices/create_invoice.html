@@ -1,0 +1,91 @@
+{% include 'nav.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalize Invoice</title>
+  <style>
+    .product-detail {
+      margin-left: 150px;
+    }
+
+    .product-detail1 {
+      margin-left: 545px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row justify-content-center mt-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3 style="color: crimson; text-decoration: underline;" class="text-center"> Invoice Details</h3>
+
+          <div class="row">
+            <div class="col-md-3">
+              <label for="invoice_number"><strong>Invoice Number</strong></label>
+              <p>{{invoice.invoice_number}}</p>
+            </div>
+            <div class="col-md-3">
+              <label for="date"><strong>Date</strong></label>
+              <p>{{invoice.invoice_date}}</p>
+            </div>
+            <div class="col-md-3">
+              <label for="seller"><strong>Seller</strong></label>
+              <p>{{invoice.seller_name}}</p>
+            </div>
+            <div class="col-md-3">
+              <label for="seller"><strong>Buyer</strong></label>
+              <p>{{invoice.buyer_name}}</p>
+            </div>
+          </div>
+
+          <div class="row my-2">
+            <div class="col-md-3">
+              <label for="seller"><strong>Purchase Order</strong></label>
+              <p>{{invoice.purchase_order}}</p>
+            </div>
+            <div class="col-md-3">
+              <label for="director"><strong>Director</strong></label>
+              <p>{{invoice.director_name}}</p>
+            </div>
+            <div class="col-md-6">
+              <label for="seller"><strong>Bank Details</strong></label>
+              <p>{{invoice.bank_details}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4 mx-2">
+          <ul>
+            {% for p in product %}
+            <div class="col-md-12 mx-2">
+              <li>
+                <strong>Product Name:</strong> {{ p.all_info.productName }}, <strong class="mx-2">Quantity:</strong>
+                {{ p.all_info.quantity }}, <strong class="mx-2">Price:</strong> {{ p.all_info.price }}
+              </li>
+            </div>
+            {% empty %}
+            <li>No products associated with this quote.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="row my-2 mx-2">
+          <ul class="mx-2">
+            <li><strong>Total Price:</strong> {{ quote.total_price }}</li>
+          </ul>
+        </div>
+        <div class="my-4">
+          <a href="{% url 'invoice_pdf' id=quote.id %}" class="btn btn-primary ml-4" target="_blank">Generate PDF</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>

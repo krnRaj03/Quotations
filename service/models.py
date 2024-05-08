@@ -86,6 +86,7 @@ class Quote(models.Model):
         return self.quotation_number+" - "+self.client_name
 
 class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     quote = models.ForeignKey(Quote, on_delete=models.CASCADE)
     all_info=models.JSONField()
     total_price = models.FloatField(default=0.0)
@@ -93,7 +94,7 @@ class Product(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.quote.quotation_number
+        return self.quote.quotation_number+" - "+str(self.id)
 
 class InvoiceModel (models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

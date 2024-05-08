@@ -122,6 +122,8 @@
                     <th>S No.</th>
                     <th>Product Name</th>
                     <th>Delivery Date</th>
+                    <th>COO</th>
+                    <th>HS Code</th>
                     <th>Quantity</th>
                     <th>Uom</th>
                     <th>Price</th>
@@ -142,11 +144,14 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <!-- TABLE ROWS -->
                   <tr>
                     <td><input type="text" id="auto-increment" class="auto-increment-field custom-width" disabled
                         value="1"></td>
                     <td><input type="text" name="product-name" class="form-control"></td>
                     <td><input type="text" name="delivery-date" class="form-control"></td>
+                    <td><input type="text" name="coo" class="custom-field"></td>
+                    <td><input type="text" name="hs-code" class="custom-field1"></td>
                     <td><input type="text" name="quantity" class="custom-field" value="1"></td>
                     <td><input type="text" name="uom" class="custom-field" required></td>
                     <td><input type="text" name="price" class="custom-field1"></td>
@@ -277,13 +282,14 @@
           // Collect data from this row
           var product = {
             productName: row.find('[name="product-name"]').val(),
+            coo: row.find('[name="coo"]').val(),
+            hsCode: row.find('[name="hs-code"]').val(),
             deliveryDate: row.find('[name="delivery-date"]').val(),
             quantity: row.find('[name="quantity"]').val(),
             uom: row.find('[name="uom"]').val(),
             price: row.find('[name="price"]').val(),
             total: row.find('[name="total"]').val(),
             profit: row.find('[name="profit"]').val(),
-
           };
           productsData.push(product); // Add row's data to array
         });
@@ -293,7 +299,6 @@
 
         // Programmatically submit the form
         this.submit(); // Now it should include data from all rows
-        console.log(productsData);
       });
     });
 

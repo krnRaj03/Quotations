@@ -51,13 +51,14 @@
           <p class="uom mb-1"><strong>Unit of Measure:</strong> {{ prod.all_info.uom }}</p>
           <p class="price mb-1"><strong>Price:</strong> ${{ prod.all_info.price }}</p>
           <p class="total mb-3"><strong>Total:</strong> ${{ prod.all_info.total }}</p>
-          <a href="{% url 'edit' id=quote.id %}" class="btn btn-primary">Edit</a>
         </div>
       </div>
       {% endfor %}
     </div>
 
-    <a href="{% url 'create_quotation' id=quote.id %}" class="btn btn-success mb-4">Generate Quote</a>
+    <a href="{% url 'create_quotation' id=quote.id %}" class="btn btn-success mb-4" target="_blank">Generate Quote</a>
+
+
   </div>
 
   <!-- Include Bootstrap JS and its dependencies -->

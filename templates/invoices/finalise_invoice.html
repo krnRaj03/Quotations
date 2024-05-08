@@ -64,11 +64,6 @@
                 <label for="director"><strong>Director</strong></label>
                 <input type="text" class="form-control" id="director" name="director" value="Natavan Shabanova">
               </div>
-              <!-- <div class="col-md-6">
-                <label for="delivery-terms"><strong>Delivery Terms</strong></label>
-                <input type="text" class="form-control" id="delivery-terms" name="delivery_terms"
-                  value="{{ invoice.delivery_terms }}">
-              </div> -->
             </div>
             <div class="row mt-4 mx-2">
               <ul>
@@ -76,7 +71,7 @@
                 <div class="col-md-12">
                   <li>
                     <strong>Product Name:</strong> {{ p.all_info.productName }}, <strong class="mx-2">Quantity:</strong>
-                    {{ p.all_info.quantity }}, <strong class="mx-2">Price:</strong> {{ p.all_info.price }}
+                    {{ p.all_info.quantity }}, <strong class="mx-2">Unit Price:</strong> {{ p.all_info.price }}
                   </li>
                 </div>
                 {% empty %}
@@ -90,10 +85,9 @@
               </ul>
             </div>
             <div class="my-4">
-              <button type="submit" class="btn btn-primary">Save Invoice</button>
+              <button type="submit" class="btn btn-primary">Finalize PDF</button>
             </div>
           </form>
-          <a href="{% url 'create_invoice' id=quote.id  %}" class="btn btn-success mb-4">Generate Invoice</a>
 
         </div>
       </div>
