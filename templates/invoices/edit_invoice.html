@@ -17,30 +17,39 @@
         {% csrf_token %}
         <div class="card-body">
           <!-- CLIENT DETAILS -->
-          <h3 style="color: crimson;">Client Details</h3>
+          <h3 style="color: crimson;">Invoice Details</h3>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-4">
-                <h5 class="card-title">Company Name:</h5>
-                <input type="text" name="company_name" class="form-control" value="{{ quote.company_name }}">
+              <div class="col-md-3">
+                <h5 class="card-title">Invoice Number:</h5>
+                <input type="text" name="invoice_number" class="form-control" value="{{ invoice.invoice_number }}">
               </div>
-              <div class="col-md-4">
-                <h5 class="card-title">Client Name:</h5>
-                <input type="text" name="client_name" class="form-control" value="{{ quote.client_name }}">
+              <div class="col-md-3">
+                <h5 class="card-title">Purchase Order:</h5>
+                <input type="text" name="purchase_order" class="form-control" value="{{ invoice.purchase_order }}">
               </div>
-              <div class="col-md-4">
-                <h5 class="card-title">Client Email:</h5>
-                <input type="text" name="client_email" class="form-control" value="{{ quote.client_email }}">
+              <div class="col-md-3">
+                <h5 class="card-title">Invoice Date:</h5>
+                <input type="text" name="invoice_date" class="form-control" value="{{ invoice.invoice_date }}">
+              </div>
+              <div class="col-md-3">
+                <h5 class="card-title">Buyer Name:</h5>
+                <input type="text" name="buyer_name" class="form-control" value="{{ invoice.buyer_name }}">
               </div>
             </div>
             <div class="row mt-4">
-              <div class="col-md-4">
-                <h5 class="card-title">Total Price:</h5>
-                <input type="text" name="total_price" class="form-control" value="{{ quote.total_price }}">
+              <div class="col-md-3">
+                <h5 class="card-title">Seller Name:</h5>
+                <input type="text" name="seller_name" class="form-control" value="{{ invoice.seller_name }}">
               </div>
-              <div class="col-md-4">
-                <h5 class="card-title">Profit:</h5>
-                <input type="text" name="profit" class="form-control" value="{{ quote.profit }}">
+              <div class="col-md-3">
+                <h5 class="card-title">Director Name:</h5>
+                <input type="text" name="director_name" class="form-control" value="{{ invoice.director_name }}">
+              </div>
+              <div class="col-md-6">
+                <h5 class="card-title">Bank Details:</h5>
+                <textarea style="height: 120px;" name="bank_details"
+                  class="form-control">{{ invoice.bank_details }}</textarea>
               </div>
             </div>
           </div>
@@ -51,15 +60,16 @@
             <div class="row">
               <div class="col-md-4">
                 <h5 class="card-title">Inco terms:</h5>
-                <input type="text" name="inco_terms" class="form-control" value="{{ quote.inco_terms }}">
+                <input type="text" name="inco_terms" class="form-control" value="{{ invoice.quote.inco_terms }}">
               </div>
               <div class="col-md-4">
-                <h5 class="card-title">VAT:</h5>
-                <input type="text" name="vat" class="form-control" value="{{ quote.vat }} ">
+                <h5 class="card-title">VAT %:</h5>
+                <input type="text" name="vat" class="form-control" value="{{ invoice.quote.vat }} ">
               </div>
               <div class="col-md-4">
                 <h5 class="card-title">Weight:</h5>
-                <input type="text" name="shipment_weight" class="form-control" value="{{ quote.shipment_weight }}">
+                <input type="text" name="shipment_weight" class="form-control"
+                  value="{{ invoice.quote.shipment_weight }}">
               </div>
             </div>
           </div>
@@ -76,8 +86,7 @@
                   <ul>
                     <li><strong>Product Name:</strong><input type="text" class="form-control productName"
                         value="{{ prod.all_info.productName }}"></li>
-                    <li><strong>Delivery Date:</strong><input type="text" class="form-control deliveryDate"
-                        value="{{ prod.all_info.deliveryDate }}"></li>
+
                     <li><strong>Quantity:</strong><input type="number" class="form-control quantity"
                         value="{{ prod.all_info.quantity }}"></li>
                     <li><strong>Unit of Measure:</strong><input type="text" class="form-control uom"
@@ -108,7 +117,6 @@
         products.push({
           id: $item.find('.product-id').val(),  // Collecting the hidden ID
           productName: $item.find('.productName').val(),
-          deliveryDate: $item.find('.deliveryDate').val(),
           quantity: $item.find('.quantity').val(),
           uom: $item.find('.uom').val(),
           price: $item.find('.price').val(),

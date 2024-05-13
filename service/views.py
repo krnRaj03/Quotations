@@ -139,10 +139,16 @@ def edit_quotation(request, id):
 
         # Update Product 
     products_json = request.POST.get('products_json')
+    
     if products_json:
         products_data = json.loads(products_json)
+        print(type(products_data))
         for product_info in products_data:
             product_id = product_info.get('id')
+            product_quantity = int(product_info.get('quantity'))
+            product_price = int(product_info.get('price'))
+            total = product_quantity * product_price
+            print(total)
             if product_id:
                 product = Product.objects.get(id=product_id)
                 product.all_info = {
@@ -151,12 +157,20 @@ def edit_quotation(request, id):
                     'quantity': product_info.get('quantity'),
                     'uom': product_info.get('uom'),
                     'price': product_info.get('price'),
-                    'total': product_info.get('total')
+                    'total': total,
                 }
                 product.save()
         return redirect('view_all')  # Redirect after POST
 
     return render(request, 'quotes/edit_quote.html', {'quote': quote, 'products': products})
+
+
+def edit_invoice(request, id):
+    invoice = InvoiceModel.objects.get(id=id)
+    products = Product.objects.filter(quote=invoice.quote)
+    print(products, invoice)
+
+    return render(request, 'invoices/edit_invoice.html', {'invoice': invoice, 'products': products})
 
 
 def view_all_quotes(request):
@@ -634,7 +648,11 @@ def delete_quote(request, id):
     quote.delete()
     return redirect('view_all')
 
-    
+
+def delete_invoice(request, id):
+    invoice = InvoiceModel.objects.get(id=id)
+    invoice.delete()
+    return redirect('view_all_invoices')
     
     
     

@@ -8,7 +8,7 @@ urlpatterns = [
     
     #Quote URLs
     path('finalise-quote/<uuid:id>',finalise_quotation,name='finalise_quotation'),
-    path('edit_quote/<uuid:id>',edit_quotation,name='edit_quote'),
+    path('edit-quote/<uuid:id>',edit_quotation,name='edit_quote'),
     path('create-quotation/<uuid:id>',create_quotation,name='create_quotation'),
     path('quote/delete/<uuid:id>/', delete_quote, name='delete_quote'),
     path('view-all-quotes/',view_all_quotes,name='view_all'),
@@ -20,4 +20,6 @@ urlpatterns = [
     path('create-invoice/<uuid:id>',create_invoice,name='create_invoice'),
     path('invoice-pdf/<uuid:id>',invoice_pdf,name='invoice_pdf'),
     path('view-all-invoices/',view_all_invoices,name='view_all_invoices'),
+    path('edit-invoice/<uuid:id>',edit_invoice,name='edit_invoice'),
+    path('invoice/delete/<uuid:id>/', delete_invoice, name='delete_invoice'),
 ]
