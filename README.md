@@ -1,6 +1,6 @@
-<h1>Excel Simplifier for Quotes and Invoices</h1>
+<h1>Avista Quotation & Invoicing system</h1>
 
-<p>Welcome to the Excel Simplifier for Quotes and Invoices! This project automates the complex functionalities of Excel for creating, editing, viewing, and deleting quotes and invoices with a single click. You can also generate PDF quotations and invoices effortlessly and visualize your data with monthly and yearly graphs.</p>
+<p>Welcome to the Avista Quotation & Invoicing system! This project automates the complex functionalities of Excel for creating, editing, viewing, and deleting quotes and invoices with a single click. You can also generate PDF quotations and invoices effortlessly and visualize your data with monthly and yearly graphs.</p>
 
 <h2>Features</h2>
 <ul>
