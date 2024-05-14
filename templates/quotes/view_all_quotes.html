@@ -52,7 +52,7 @@
               <td>{{ quote.client_name }}</td>
               <td>{{quote.date_created}}</td>
               <td>
-                <a href="{% url 'view_single' quote.id %}" class="btn btn-primary">View</a>
+                <a href="{% url 'view_single_quote' quote.id %}" class="btn btn-primary">View</a>
               </td>
               <td>
                 <a href="{% url 'edit_quote' quote.id %}" class="btn btn-success">Edit</a>

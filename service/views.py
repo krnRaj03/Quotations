@@ -16,6 +16,7 @@ current_date = datetime.datetime.now()
 fortnight = current_date + datetime.timedelta(days=15)
 
 
+# NAV & HOME
 def nav(request):
     return render(request, "nav.html")
 
@@ -57,7 +58,9 @@ def home(request):
     }
     return render(request, "home.html", context)
 
+#############################
 
+#Quotes
 def create_quote(request):
     total_sum = 0
     total_profit=0  
@@ -121,323 +124,6 @@ def finalise_quotation(request,id):
     return render(request, "quotes/finalise_quote.html", context)
 
 
-def edit_quotation(request, id):
-    quote = Quote.objects.get(id=id)
-    products=Product.objects.filter(quote=quote)
-
-    if request.method == 'POST':
-        # Update Quote
-        quote.company_name = request.POST.get('company_name')
-        quote.client_name = request.POST.get('client_name')
-        quote.client_email = request.POST.get('client_email')
-        quote.total_price = request.POST.get('total_price', 0.0)
-        quote.profit = request.POST.get('profit', 0.0)
-        quote.vat = request.POST.get('vat')
-        quote.inco_terms = request.POST.get('inco_terms')
-        quote.shipment_weight = request.POST.get('shipment_weight')
-        quote.save()
-
-        # Update Product 
-    products_json = request.POST.get('products_json')
-    
-    if products_json:
-        products_data = json.loads(products_json)
-        print(type(products_data))
-        for product_info in products_data:
-            product_id = product_info.get('id')
-            product_quantity = int(product_info.get('quantity'))
-            product_price = int(product_info.get('price'))
-            total = product_quantity * product_price
-            print(total)
-            if product_id:
-                product = Product.objects.get(id=product_id)
-                product.all_info = {
-                    'productName': product_info.get('productName'),
-                    'deliveryDate': product_info.get('deliveryDate'),
-                    'quantity': product_info.get('quantity'),
-                    'uom': product_info.get('uom'),
-                    'price': product_info.get('price'),
-                    'total': total,
-                }
-                product.save()
-        return redirect('view_all')  # Redirect after POST
-
-    return render(request, 'quotes/edit_quote.html', {'quote': quote, 'products': products})
-
-
-def edit_invoice(request, id):
-    invoice = InvoiceModel.objects.get(id=id)
-    products = Product.objects.filter(quote=invoice.quote)
-    print(products, invoice)
-
-    return render(request, 'invoices/edit_invoice.html', {'invoice': invoice, 'products': products})
-
-
-def view_all_quotes(request):
-    get_quotations = Quote.objects.all()
-   
-    context = {"quotes":get_quotations}
-    return render(request, "quotes/view_all_quotes.html", context)
-
-
-def view_single_quote(request, quote_id):
-    quote = Quote.objects.get(id=quote_id)
-    products = quote.product_set.all()  
-    
-    return render(request, 'quotes/view_single_quote.html', {'quote': quote, 'products': products})
-
-
-def view_all_invoices(request):
-    invoices = InvoiceModel.objects.all()
-    context = {"invoices":invoices}
-    return render(request, "invoices/view_all_invoices.html", context)
-
-
-def finalise_invoice(request,id):
-    quote = Quote.objects.get(id=id)
-    product=Product.objects.filter(quote=quote)
-
-    # Account details
-    account_options = [
-            {
-                'value': 'AZ77PAHA40060AZNHC0100067812 - AVISTA MMC',
-                'label': 'AZN',
-                'details': """AZN Account number: AZ77PAHA40060AZNHC0100067812
-                                Account name: AVISTA MMC
-                                VÖEN: 1803853771 		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan			
-                                Correspondent account: AZ82NABZ01350100000000071944 
-                                Bank S.W.I.F.T BIK: PAHAAZ22
-                                Bank VÖEN: 1700767721
-                                Bank code: 505141"""
-            },
-            {
-                'value': 'AZ68PAHA40160USDHC0100067812 - AVISTA MMC',
-                'label': 'USD',
-                'details': """USD Account of the Beneficiary: AZ68PAHA40160USDHC0100067812		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
-                                S.W.I.F.T BIK: PAHAAZ22 		
-
-                                Correspondent account				
-                                Account with Institution: Raiffeisen Bank International AG 
-                                Address: Am Stadtpark 9, 1030 Vienna		
-                                SWIFT BIC: RZBAATWW		
-                                Correspondent account: 70-55.081.095		
-                                Identification number: 00067812"""
-            },
-            {
-                'value': 'AZ02PAHA40160EURHC0100067812 - AVISTA MMC',
-                'label': 'EUR',
-                'details': """EUR Account of the Beneficiary: AZ02PAHA40160EURHC0100067812		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
-                                S.W.I.F.T BIK: PAHAAZ22 		
-
-                                Correspondent account				
-                                Account with Institution: Raiffeisen Bank International AG 
-                                Address: Am Stadtpark 9, 1030 Vienna		
-                                SWIFT BIC: RZBAATWW		
-                                Correspondent account: 1-55.081.095		
-                                Identification number: 00067812"""
-            }
-        ]
-
-    if request.method == 'POST':
-        bank_details = request.POST['bank_details']
-        selected_details = next((item['details'] for item in account_options if item['value'] == bank_details), "No details found.")
-        invoice_number = request.POST['invoice_number']
-        invoice_date = request.POST['date']
-        seller_name = request.POST['seller']
-        buyer_name = request.POST['buyer']
-        purchase_order = request.POST['purchase_order']
-        director_name = request.POST['director']
-
-        invoice=InvoiceModel.objects.create(invoice_number=invoice_number,quote=quote,
-                                        purchase_order=purchase_order,invoice_date=invoice_date,
-                                        bank_details=selected_details,seller_name=seller_name,
-                                        buyer_name=buyer_name,director_name=director_name)
-        invoice.save()
-        return redirect('create_invoice', id=quote.id)
-           
-
-    context = {"quote":quote,"product":product,"account_options": account_options}
-    return render(request, "invoices/finalise_invoice.html", context)
-
-
-def create_invoice(request, id):
-    quote = Quote.objects.get(id=id)
-    product=Product.objects.filter(quote=quote)
-    invoice = InvoiceModel.objects.get(quote=quote)
-    bank_details_str = invoice.bank_details
-    context = {"quote":quote,"product":product,"invoice":invoice,"bank_details_str":bank_details_str}
-    return render(request, "invoices/create_invoice.html",context)
-
-
-def invoice_pdf(request, id):
-    quote = Quote.objects.get(id=id)
-    product=Product.objects.filter(quote=quote)
-    invoice = InvoiceModel.objects.get(quote=quote)
-    bank_details_str = invoice.bank_details
-
-    for p in product:
-        name=p.all_info.get('productName')
-        quantity=p.all_info.get('quantity')
-        uom=p.all_info.get('uom')
-        price=p.all_info.get('price')
-
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = f'inline; filename="{quote.quotation_number}.pdf"'
-    pdfmetrics.registerFont(TTFont("Arial", "C:/Windows/Fonts/Arial.ttf"))
-    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arialbd.ttf"))
-
-    # Create PDF object
-    p = canvas.Canvas(response)
-    p.setFont("Arial", 10)
-
-    details = [
-        (80, 710, f"Fakturanın Nömrəsi | Invoice Number | Номер фактуры: {invoice.invoice_number}           Tarix | Date | Дата: {invoice.invoice_date}"),
-        (80, 685, "Satıcı | Seller | Продавец:"+"        "+invoice.seller_name+"                      "+ "Alıcı | Buyer | Покупатель:"+ "        "+invoice.buyer_name),
-        (80, 660, "Alış Sifarişi | Purchase Order | Заказ №:"+"         "+ invoice.purchase_order),
-    ]
-
-    padding = 5  # Padding around text for rectangle
-    line_width=1.5
-    for x, y, text in details:
-        text_width = p.stringWidth(text, "Arial", 10)
-        p.drawString(x, y, text)
-        p.setLineWidth(line_width)
-        p.rect(x - padding, y - 6, text_width + 2 * padding, 18, stroke=1, fill=0)
-    
-    texts = [
-    ("№", 2),
-    ("Sayı\nQTY\nКол-во", 22),  # x offset from the start of the rectangle
-    ("Ölcü vahidi\nUOM\nЕдиница", 62),
-    ("Malların təsviri | Description of goods | Наименование товара", 125),
-    ("Qiymət\nPrice\nЦена", 380),
-    ("Toplam\nTotal\nСумма", 430)
-        ]
-    x_start = 80  # Start rectangle
-    y_start = 632 
-    font_name = "Arial"
-    font_size = 9
-    line_height = 12  
-
-    p.setFont(font_name, font_size)
-
-    # Calculate dimensions for rectangle
-    max_height = max(text.count('\n') + 1 for text, _ in texts) * line_height
-    max_width = 0
-    for text, offset in texts:
-        width = max(p.stringWidth(line, font_name, font_size) for line in text.split('\n'))
-        max_width = max(max_width, offset + width)  # Update max width considering the offset
-
-    # Draw each block of text
-    for text, offset in texts:
-        lines = text.split('\n')
-        current_y = y_start
-        for line in lines:
-            p.drawString(x_start + offset, current_y, line)
-            current_y -= line_height  # Decrement y to move to the next line
-
-    # Draw rectangle around the content
-    p.rect(x_start - 5, y_start - max_height, max_width + 10, max_height + 12, stroke=1, fill=0)
-
-    # Products
-    y = 570
-    font_size = 10
-    p.setFont("Arial-Bold", font_size)  
-    for i, prod in enumerate(product):
-        p.drawString(85, y, str(i + 1)+".")
-        p.drawString(110, y, prod.all_info['quantity'])
-        p.drawString(150, y, prod.all_info['uom'])
-        p.drawString(208, y, prod.all_info['productName'])
-        p.drawString(460, y, prod.all_info['price'])
-        p.drawString(510, y, prod.all_info['total'])
-        y -= 18  # Move to the next line
-    y -= 5 
-
-    font_size =10
-    p.setFont("Arial-Bold", font_size)
-    p.drawString(80, y, "Şərtlər | Terms | Условие:"+"                 "+"Rate: 1.00€ = ")
-    y -= 15
-
-    p.setFont("Arial", 9)
-    p.drawString(250, y, "Terms:"+ "        "+ quote.inco_terms)
-    y -= 15
-
-    p.drawString(298,y,"50% in advance, 50% before shipping")
-    y -= 6
-
-    #horizontal line
-    x_start = 80  
-    x_end = 550   
-    y_position = y  
-    p.line(x_start, y_position, x_end, y_position)
-    y -= 12
-
-    p.drawString(150, y, "Ümumi məbləğ ƏDV-siz | Total net value excl TAX | Всего без НДС:"+"        "+ str(quote.pre_tax_total))
-    y -= 12
-    p.drawString(350, y, "ƏDV | VAT | НДС:" + "        "+ str(quote.vat)+"%")
-    y -= 12
-    p.setFont("Arial-Bold", 9)
-    p.drawString(314, y, "ÜMUMİ | TOTAL | ВСЕГО:"+"        "+ str(quote.total_price))
-    y -= 8
-
-    #horizontal line
-    x_start = 80  
-    x_end = 550   
-    y_position = y  
-    p.line(x_start, y_position, x_end, y_position)
-    y -= 20
-
-    p.setFont("Arial-Bold", 12)
-    p.drawString(80, y, "BANK REKVIZITLƏRİ | BANK DETAILS | РЕКВИЗИТЫ СЧЁТА:")
-    y -= 10
-
-    details_list = bank_details_str.split('                          ')
-    y -= 8  
-    
-    p.setFont("Arial", 9)
-    for detail in details_list:
-        detail = detail.strip()
-        if detail: 
-            p.drawString(80, y, detail)
-            y -= 12  
-
-    p.setFont("Arial", 9)
-    p.drawString(80,y,invoice.bank_details)
-    y -= 40
-
-    p.setFont("Arial-Bold", 12)
-    p.drawString(80, y, "AVISTA LLC")
-    y-= 10
-    p.setFont("Arial", 10)
-    p.drawString(80, y, "Direktor | Director | Директор")
-    y -= 10
-    p.drawString(80, y, invoice.director_name)
-
-
-
-    # Main Header
-    p.setFont("Arial", 10)
-    p.drawString(60, 800, "www.bakustock.com")
-    p.drawString(60, 788, "Tel: 050 406 30 77")
-
-    p.setFont("Arial-Bold", 14)
-    p.drawString(250, 800, "AVISTA LLC")
-
-    p.setFont("Arial", 10)
-    p.drawString(400, 800, "E-mail: avista@bakustock.com")
-    p.drawString(400, 788, "E-mail: avista.mmc@gmail.com")
-
-    p.setFont("Arial-Bold", 14)
-    p.drawString(80, 740, "HESAB FAKTURA | INVOICE | СЧЁТ ФАКТУРА")
-
-    p.showPage()
-    p.save()
-    print("PDF created")
-    return response
-
-
 def create_quotation(request,id):
     quote=Quote.objects.get(id=id)
     total_price=format(quote.total_price, '.2f')
@@ -453,8 +139,8 @@ def create_quotation(request,id):
     #PDF object 
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = 'inline; filename=f"{quote_no}.pdf"'
-    pdfmetrics.registerFont(TTFont("Arial", "C:/Windows/Fonts/Arial.ttf"))
-    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arialbd.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial", "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arial.ttf"))
 
     p = canvas.Canvas(response)
     def check_page(y, font_name="Arial", font_size=10):
@@ -643,10 +329,329 @@ def create_quotation(request,id):
     return response
 
 
+def edit_quotation(request, id):
+    quote = Quote.objects.get(id=id)
+    products=Product.objects.filter(quote=quote)
+
+    if request.method == 'POST':
+        # Update Quote
+        quote.company_name = request.POST.get('company_name')
+        quote.client_name = request.POST.get('client_name')
+        quote.client_email = request.POST.get('client_email')
+        quote.total_price = request.POST.get('total_price', 0.0)
+        quote.profit = request.POST.get('profit', 0.0)
+        quote.vat = request.POST.get('vat')
+        quote.inco_terms = request.POST.get('inco_terms')
+        quote.shipment_weight = request.POST.get('shipment_weight')
+        quote.save()
+
+        # Update Product 
+    products_json = request.POST.get('products_json')
+    
+    if products_json:
+        products_data = json.loads(products_json)
+        print(type(products_data))
+        for product_info in products_data:
+            product_id = product_info.get('id')
+            product_quantity = int(product_info.get('quantity'))
+            product_price = int(product_info.get('price'))
+            total = product_quantity * product_price
+            print(total)
+            if product_id:
+                product = Product.objects.get(id=product_id)
+                product.all_info = {
+                    'productName': product_info.get('productName'),
+                    'deliveryDate': product_info.get('deliveryDate'),
+                    'quantity': product_info.get('quantity'),
+                    'uom': product_info.get('uom'),
+                    'price': product_info.get('price'),
+                    'total': total,
+                }
+                product.save()
+        return redirect('view_all')  # Redirect after POST
+
+    return render(request, 'quotes/edit_quote.html', {'quote': quote, 'products': products})
+
+
+def view_all_quotes(request):
+    get_quotations = Quote.objects.all()
+   
+    context = {"quotes":get_quotations}
+    return render(request, "quotes/view_all_quotes.html", context)
+
+
+def view_single_quote(request, quote_id):
+    quote = Quote.objects.get(id=quote_id)
+    products = quote.product_set.all()  
+    
+    return render(request, 'quotes/view_single_quote.html', {'quote': quote, 'products': products})
+
+
 def delete_quote(request, id):
     quote = Quote.objects.get(id=id)
     quote.delete()
     return redirect('view_all')
+
+
+#################################
+
+#Invoices
+def view_all_invoices(request):
+    invoices = InvoiceModel.objects.all()
+    context = {"invoices":invoices}
+    return render(request, "invoices/view_all_invoices.html", context)
+
+
+def view_single_invoice(request,invoice_id):
+    invoice=InvoiceModel.objects.get(id=invoice_id)
+    products=Product.objects.filter(quote=invoice.quote)
+    context={"invoice":invoice,"products":products}
+    return render(request, "invoices/view_single_invoice.html", context)
+
+
+def finalise_invoice(request,id):
+    quote = Quote.objects.get(id=id)
+    product=Product.objects.filter(quote=quote)
+
+    # Account details
+    account_options = [
+            {
+                'value': 'AZ77PAHA40060AZNHC0100067812 - AVISTA MMC',
+                'label': 'AZN',
+                'details': """AZN Account number: AZ77PAHA40060AZNHC0100067812
+                                Account name: AVISTA MMC
+                                VÖEN: 1803853771 		
+                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan			
+                                Correspondent account: AZ82NABZ01350100000000071944 
+                                Bank S.W.I.F.T BIK: PAHAAZ22
+                                Bank VÖEN: 1700767721
+                                Bank code: 505141"""
+            },
+            {
+                'value': 'AZ68PAHA40160USDHC0100067812 - AVISTA MMC',
+                'label': 'USD',
+                'details': """USD Account of the Beneficiary: AZ68PAHA40160USDHC0100067812		
+                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
+                                S.W.I.F.T BIK: PAHAAZ22 		
+
+                                Correspondent account				
+                                Account with Institution: Raiffeisen Bank International AG 
+                                Address: Am Stadtpark 9, 1030 Vienna		
+                                SWIFT BIC: RZBAATWW		
+                                Correspondent account: 70-55.081.095		
+                                Identification number: 00067812"""
+            },
+            {
+                'value': 'AZ02PAHA40160EURHC0100067812 - AVISTA MMC',
+                'label': 'EUR',
+                'details': """EUR Account of the Beneficiary: AZ02PAHA40160EURHC0100067812		
+                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
+                                S.W.I.F.T BIK: PAHAAZ22 		
+
+                                Correspondent account				
+                                Account with Institution: Raiffeisen Bank International AG 
+                                Address: Am Stadtpark 9, 1030 Vienna		
+                                SWIFT BIC: RZBAATWW		
+                                Correspondent account: 1-55.081.095		
+                                Identification number: 00067812"""
+            }
+        ]
+
+    if request.method == 'POST':
+        bank_details = request.POST['bank_details']
+        selected_details = next((item['details'] for item in account_options if item['value'] == bank_details), "No details found.")
+        invoice_number = request.POST['invoice_number']
+        invoice_date = request.POST['date']
+        seller_name = request.POST['seller']
+        buyer_name = request.POST['buyer']
+        purchase_order = request.POST['purchase_order']
+        director_name = request.POST['director']
+
+        invoice=InvoiceModel.objects.create(invoice_number=invoice_number,quote=quote,
+                                        purchase_order=purchase_order,invoice_date=invoice_date,
+                                        bank_details=selected_details,seller_name=seller_name,
+                                        buyer_name=buyer_name,director_name=director_name)
+        invoice.save()
+        return redirect('create_invoice', id=quote.id)
+           
+
+    context = {"quote":quote,"product":product,"account_options": account_options}
+    return render(request, "invoices/finalise_invoice.html", context)
+
+
+def create_invoice(request, id):
+    quote = Quote.objects.get(id=id)
+    product=Product.objects.filter(quote=quote)
+    invoice = InvoiceModel.objects.get(quote=quote)
+    bank_details_str = invoice.bank_details
+    context = {"quote":quote,"product":product,"invoice":invoice,"bank_details_str":bank_details_str}
+    return render(request, "invoices/create_invoice.html",context)
+
+
+def invoice_pdf(request, id):
+    quote = Quote.objects.get(id=id)
+    product=Product.objects.filter(quote=quote)
+    invoice = InvoiceModel.objects.get(quote=quote)
+    bank_details_str = invoice.bank_details
+
+    for p in product:
+        name=p.all_info.get('productName')
+        quantity=p.all_info.get('quantity')
+        uom=p.all_info.get('uom')
+        price=p.all_info.get('price')
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="{quote.quotation_number}.pdf"'
+    pdfmetrics.registerFont(TTFont("Arial", "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arial.ttf"))
+
+    # Create PDF object
+    p = canvas.Canvas(response)
+    p.setFont("Arial", 10)
+
+    details = [
+        (80, 710, f"Fakturanın Nömrəsi | Invoice Number | Номер фактуры: {invoice.invoice_number}           Tarix | Date | Дата: {invoice.invoice_date}"),
+        (80, 685, "Satıcı | Seller | Продавец:"+"        "+invoice.seller_name+"                      "+ "Alıcı | Buyer | Покупатель:"+ "        "+invoice.buyer_name),
+        (80, 660, "Alış Sifarişi | Purchase Order | Заказ №:"+"         "+ invoice.purchase_order),
+    ]
+
+    padding = 5  # Padding around text for rectangle
+    line_width=1.5
+    for x, y, text in details:
+        text_width = p.stringWidth(text, "Arial", 10)
+        p.drawString(x, y, text)
+        p.setLineWidth(line_width)
+        p.rect(x - padding, y - 6, text_width + 2 * padding, 18, stroke=1, fill=0)
+    
+    texts = [
+    ("№", 2),
+    ("Sayı\nQTY\nКол-во", 22),  # x offset from the start of the rectangle
+    ("Ölcü vahidi\nUOM\nЕдиница", 62),
+    ("Malların təsviri | Description of goods | Наименование товара", 125),
+    ("Qiymət\nPrice\nЦена", 380),
+    ("Toplam\nTotal\nСумма", 430)
+        ]
+    x_start = 80  # Start rectangle
+    y_start = 632 
+    font_name = "Arial"
+    font_size = 9
+    line_height = 12  
+
+    p.setFont(font_name, font_size)
+
+    # Calculate dimensions for rectangle
+    max_height = max(text.count('\n') + 1 for text, _ in texts) * line_height
+    max_width = 0
+    for text, offset in texts:
+        width = max(p.stringWidth(line, font_name, font_size) for line in text.split('\n'))
+        max_width = max(max_width, offset + width)  # Update max width considering the offset
+
+    # Draw each block of text
+    for text, offset in texts:
+        lines = text.split('\n')
+        current_y = y_start
+        for line in lines:
+            p.drawString(x_start + offset, current_y, line)
+            current_y -= line_height  # Decrement y to move to the next line
+
+    # Draw rectangle around the content
+    p.rect(x_start - 5, y_start - max_height, max_width + 10, max_height + 12, stroke=1, fill=0)
+
+    # Products
+    y = 570
+    font_size = 10
+    p.setFont("Arial-Bold", font_size)  
+    for i, prod in enumerate(product):
+        p.drawString(85, y, str(i + 1)+".")
+        p.drawString(110, y, prod.all_info['quantity'])
+        p.drawString(150, y, prod.all_info['uom'])
+        p.drawString(208, y, prod.all_info['productName'])
+        p.drawString(460, y, prod.all_info['price'])
+        p.drawString(510, y, prod.all_info['total'])
+        y -= 18  # Move to the next line
+    y -= 5 
+
+    font_size =10
+    p.setFont("Arial-Bold", font_size)
+    p.drawString(80, y, "Şərtlər | Terms | Условие:"+"                 "+"Rate: 1.00€ = ")
+    y -= 15
+
+    p.setFont("Arial", 9)
+    p.drawString(250, y, "Terms:"+ "        "+ quote.inco_terms)
+    y -= 15
+
+    p.drawString(298,y,"50% in advance, 50% before shipping")
+    y -= 6
+
+    #horizontal line
+    x_start = 80  
+    x_end = 550   
+    y_position = y  
+    p.line(x_start, y_position, x_end, y_position)
+    y -= 12
+
+    p.drawString(150, y, "Ümumi məbləğ ƏDV-siz | Total net value excl TAX | Всего без НДС:"+"        "+ str(quote.pre_tax_total))
+    y -= 12
+    p.drawString(350, y, "ƏDV | VAT | НДС:" + "        "+ str(quote.vat)+"%")
+    y -= 12
+    p.setFont("Arial-Bold", 9)
+    p.drawString(314, y, "ÜMUMİ | TOTAL | ВСЕГО:"+"        "+ str(quote.total_price))
+    y -= 8
+
+    #horizontal line
+    x_start = 80  
+    x_end = 550   
+    y_position = y  
+    p.line(x_start, y_position, x_end, y_position)
+    y -= 20
+
+    p.setFont("Arial-Bold", 12)
+    p.drawString(80, y, "BANK REKVIZITLƏRİ | BANK DETAILS | РЕКВИЗИТЫ СЧЁТА:")
+    y -= 10
+
+    details_list = bank_details_str.split('                          ')
+    y -= 8  
+    
+    p.setFont("Arial", 9)
+    for detail in details_list:
+        detail = detail.strip()
+        if detail: 
+            p.drawString(80, y, detail)
+            y -= 12  
+
+    p.setFont("Arial", 9)
+    p.drawString(80,y,invoice.bank_details)
+    y -= 40
+
+    p.setFont("Arial-Bold", 12)
+    p.drawString(80, y, "AVISTA LLC")
+    y-= 10
+    p.setFont("Arial", 10)
+    p.drawString(80, y, "Direktor | Director | Директор")
+    y -= 10
+    p.drawString(80, y, invoice.director_name)
+
+
+
+    # Main Header
+    p.setFont("Arial", 10)
+    p.drawString(60, 800, "www.bakustock.com")
+    p.drawString(60, 788, "Tel: 050 406 30 77")
+
+    p.setFont("Arial-Bold", 14)
+    p.drawString(250, 800, "AVISTA LLC")
+
+    p.setFont("Arial", 10)
+    p.drawString(400, 800, "E-mail: avista@bakustock.com")
+    p.drawString(400, 788, "E-mail: avista.mmc@gmail.com")
+
+    p.setFont("Arial-Bold", 14)
+    p.drawString(80, 740, "HESAB FAKTURA | INVOICE | СЧЁТ ФАКТУРА")
+
+    p.showPage()
+    p.save()
+    print("PDF created")
+    return response
 
 
 def delete_invoice(request, id):
@@ -655,4 +660,43 @@ def delete_invoice(request, id):
     return redirect('view_all_invoices')
     
     
-    
+def edit_invoice(request, id):
+    invoice = InvoiceModel.objects.get(id=id)
+    products = Product.objects.filter(quote=invoice.quote)
+
+    if request.method == 'POST':
+        # Update Invoice
+        invoice.invoice_number = request.POST.get('invoice_number')
+        invoice.purchase_order = request.POST.get('purchase_order')
+        invoice.invoice_date = request.POST.get('invoice_date')
+        invoice.seller_name = request.POST.get('seller_name')
+        invoice.buyer_name = request.POST.get('buyer_name')
+        invoice.director_name = request.POST.get('director_name')
+        invoice.bank_details = request.POST.get('bank_details')
+        invoice.save()
+
+        # Update Product 
+        products_json = request.POST.get('products_json')
+        print(type(products_json))
+        if products_json:
+            products_data = json.loads(products_json)
+            print(type(products_data))
+            for product_info in products_data:
+                product_id = product_info.get('id')
+                product_quantity = int(product_info.get('quantity'))
+                product_price = int(product_info.get('price'))
+                total = product_quantity * product_price
+                if product_id:
+                    product = Product.objects.get(id=product_id)
+                    product.all_info = {
+                        'productName': product_info.get('productName'),
+                        'deliveryDate': product_info.get('deliveryDate'),
+                        'quantity': product_info.get('quantity'),
+                        'uom': product_info.get('uom'),
+                        'price': product_info.get('price'),
+                        'total': total,
+                    }
+                    product.save()
+            return redirect('view_all_invoices')
+
+    return render(request, 'invoices/edit_invoice.html', {'invoice': invoice, 'products': products})

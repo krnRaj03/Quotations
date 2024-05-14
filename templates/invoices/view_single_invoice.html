@@ -1,0 +1,90 @@
+{% include 'nav.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Details</title>
+  <!-- Include Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container {
+      background-color: #fff;
+      border-radius: 5px;
+      padding: 30px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul li {
+      margin-bottom: 10px;
+    }
+
+    .btn-back {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-4 mb-4">
+
+    <h2>Invoice Information:</h2>
+  
+
+
+    <ul>
+      <li><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</li>
+      <li><strong>Purchase Order:</strong> {{ invoice.purchase_order }}</li>
+      <li><strong>Seller Name:</strong> {{ invoice.seller_name }}</li>
+      <li><strong>Buyer Name:</strong> {{ invoice.buyer_name }}</li>
+      <li><strong>Invoice Date:</strong> {{ invoice.invoice_date }}</li>
+      <li><strong>Director Name:</strong> {{invoice.director_name}}</li>
+      <li><strong>Bank Details:</strong> {{invoice.bank_details}}EUR</li>
+    </ul>
+
+    <h2>Products:</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product Info</th>
+          <th>Quantity</th>
+          <th>UOM</th>
+          <th>Total</th>
+        
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product.all_info.productName }}</td>
+          <td>{{ product.all_info.quantity }}</td>
+          <td>{{ product.all_info.uom }}</td>
+          <td>{{ product.all_info.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- <a href="{% url 'view_all' %}" class="btn btn-primary btn-back text-end">Back</a> -->
+    <div class="text-end">
+      <a href="{% url 'view_all' %}" class="btn btn-primary text-end">Back</a>
+    </div>
+    <!-- Add link to go back to previous page -->
+  </div>
+  <!-- Include Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
