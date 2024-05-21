@@ -29,13 +29,11 @@ def home(request):
         .annotate(total=Count('id'))
         .order_by('month')
     )
-    profit_per_month = (
-        Quote.objects
-        .annotate(month=TruncMonth('date_created'))
-        .values('month')
-        .annotate(total_profit=Sum('profit'))
-        .order_by('month')
-    )
+    quotes_with_invoices = Quote.objects.filter(invoicemodel__isnull=False).distinct()
+
+    profit_sum=0
+    for qwi in quotes_with_invoices:
+        profit_sum+=qwi.profit    
 
     invoices_per_month = (
         InvoiceModel.objects
@@ -48,13 +46,13 @@ def home(request):
     month_labels = [quote['month'].strftime('%B') for quote in quotes_per_month]
     quotes_data = [quote['total'] for quote in quotes_per_month]
     invoices_data = [invoice['total'] for invoice in invoices_per_month]
-    profit_data = [profit['total_profit'] for profit in profit_per_month]
+    profit_data=[profit_sum]
 
     context = {
         'month_labels': json.dumps(month_labels, cls=DjangoJSONEncoder),
         'quotes_data': json.dumps(quotes_data, cls=DjangoJSONEncoder),
         'invoices_data': json.dumps(invoices_data, cls=DjangoJSONEncoder),
-        'profit_data': json.dumps(profit_data, cls=DjangoJSONEncoder),
+        'profit_data': json.dumps(profit_data, cls=DjangoJSONEncoder)
     }
     return render(request, "home.html", context)
 
@@ -140,7 +138,7 @@ def create_quotation(request,id):
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = 'inline; filename=f"{quote_no}.pdf"'
     pdfmetrics.registerFont(TTFont("Arial", "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"))
-    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial_Bold", "/usr/share/fonts/truetype/msttcorefonts/arialbd.ttf"))
 
     p = canvas.Canvas(response)
     def check_page(y, font_name="Arial", font_size=10):
@@ -157,7 +155,7 @@ def create_quotation(request,id):
     p.drawString(60, 788, "Tel: 050 406 30 77")
 
     font_size = 14
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(250, 800, "AVISTA LLC")
 
     font_size = 10
@@ -165,7 +163,7 @@ def create_quotation(request,id):
     p.drawString(400, 800, "E-mail: avista@bakustock.com")
     p.drawString(400, 788, "E-mail: avista.mmc@gmail.com")
 
-    p.setFont("Arial-Bold", 11)
+    p.setFont("Arial_Bold", 11)
     p.drawString(60, 720, "QİYMƏT TƏKLİFİ | QUOTATION | КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ")
 
     p.setFont("Arial", 9)
@@ -274,54 +272,54 @@ def create_quotation(request,id):
 
     # INCOTERMS Section
     font_size = 9
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(70, y, "INCOTERMS şərtləri | INCOTERMS | Условия INCOTERMS:")
     y -= 10  
 
     font_size = 8
     p.setFont("Arial", font_size)
-    p.drawString(100, y - 2, quote.inco_terms)
-    p.drawString(100, y - 12, "Certificate of Origin will be provided if applicable:")
-    p.drawString(100, y - 22, "Certificate of Conformity on AVISTA's letterhead will be provided upon request")
+    p.drawString(85, y - 2, f"• {quote.inco_terms}.")
+    p.drawString(85, y - 12, "• Certificate of Origin will be provided if applicable.")
+    p.drawString(85, y - 22, "• Certificate of Conformity on AVISTA's letterhead will be provided upon request.")
     y -= 40  
 
     # WEIGHT & DIMENSIONS Section
     font_size = 9
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(70, y, "Çəki və ölçülər | Weight and dimensions | Вес и размеры:")
     y -= 10 
 
     font_size = 8
     p.setFont("Arial", font_size)
-    p.drawString(100, y - 2, f"Shipment Net Weight [approximate]: {quote.shipment_weight}")
-    p.drawString(100, y - 12, f"Shipment dimensions [approximate]: {quote.shipment_dimensions}")
+    p.drawString(85, y - 2, f"• Shipment Net Weight [approximate]: {quote.shipment_weight}")
+    p.drawString(85, y - 12, f"• Shipment dimensions [approximate]: {quote.shipment_dimensions}")
     y -= 30  
 
     # PAYMENT TERMS Section
     font_size = 9
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(70, y, "Ödəniş şərtləri | Payment terms | Условия оплаты:")
     y -= 10  # Space between header and details
     y = check_page(y, "Arial", 9)
     font_size = 8
     p.setFont("Arial", font_size)
-    p.drawString(100, y - 2, "100% payment in advance")
-    p.drawString(100, y - 12, "In case of exceptional market price increases AVISTA will be entitled to change offered prices within the validity period")
-    p.drawString(100, y - 22, "In case of submitting VAT Exemption Certificates 18% VAT will not be charged. In all other cases 18% VAT will be added upon invoicing")
-    p.drawString(100, y - 32, "AVISTA is not charging with VAT for the exported goods and services.")
+    p.drawString(85, y - 2, "• 100% payment in advance.")
+    p.drawString(85, y - 12, "• In case of exceptional market price increases AVISTA will be entitled to change offered prices within the validity period.")
+    p.drawString(85, y - 22, """• In case of submitting VAT Exemption Certificates 18% VAT will not be charged. In all other cases 18% VAT will be added upon invoicing.""")
+    p.drawString(85, y - 32, "• AVISTA is not charging with VAT for the exported goods and services.")
     y -= 50  
 
     # OTHER TERMS Section
     font_size = 9
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(70, y, "Digər şərtlər | Other terms | Иные условия:")
     y -= 10 
 
     font_size = 8
     p.setFont("Arial", font_size)
-    p.drawString(100, y - 2, "Availability in stock at the time of issuing PO must be checked with AVISTA")
-    p.drawString(100, y - 12, "Days/Weeks means business days/weeks. Holidays and weekends exclusive.")
-    p.drawString(100, y - 22, "AVISTA is not responsible If the buyer selects and orders wrong part number(s) without consulting with AVISTA")
+    p.drawString(85, y - 2, "• Availability in stock at the time of issuing PO must be checked with AVISTA.")
+    p.drawString(85, y - 12, "• Days/Weeks means business days/weeks. Holidays and weekends exclusive.")
+    p.drawString(85, y - 22, "• AVISTA is not responsible If the buyer selects and orders wrong part number(s) without consulting with AVISTA.")
 
     p.showPage()
     p.save()

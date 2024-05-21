@@ -10,13 +10,9 @@ class CustomUser(AbstractBaseUser):
     username = None
     email = models.EmailField(unique=True)
     password_reset_token = models.CharField(max_length=100, blank=True)
-   
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
-    # date_of_birth = models.DateField(_("dateofbirth"), blank=True, null=True)
-
     is_active = models.BooleanField(_("active"), default=True)
-    # job_title = models.CharField(max_length=20, blank=True)
     work_place = models.CharField(max_length=200, blank=True)
     is_user = models.BooleanField(_("user status"), default=True)
     is_staff = models.BooleanField(_("staff status"), default=False)

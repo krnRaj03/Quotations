@@ -42,7 +42,7 @@
       data: {{ quotes_data | safe }},
       backgroundColor: 'rgba(54, 162, 235, 0.2)',
       borderColor: 'rgba(54, 162, 235, 1)',
-      borderWidth: 1,
+      borderWidth: 2,
       barThickness: 50
         }]
       },
@@ -72,7 +72,7 @@
       data: {{ invoices_data | safe }},
       backgroundColor: 'rgba(54, 162, 235, 0.2)',
       borderColor: 'rgba(54, 162, 235, 1)',
-      borderWidth: 1,
+      borderWidth: 2,
       barThickness: 50
         }]
       },
@@ -91,34 +91,35 @@
   </script>
 
 <!-- Chart 3 -->
-  <script>
-    var ctx = document.getElementById('profitChart').getContext('2d');
-    var quotesChart = new Chart(ctx, {
+<script>
+  var ctx = document.getElementById('profitChart').getContext('2d');
+  var profitChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: {{ month_labels | safe }},
-    datasets: [{
-      label: 'Total Invoices by Month',
-      data: {{ profit_data | safe }},
-      backgroundColor: 'rgba(54, 162, 235, 0.2)',
-      borderColor: 'rgba(54, 162, 235, 1)',
-      borderWidth: 1,
-      barThickness: 50
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-            ticks: {
-            stepSize: 1,
-              precision: 0
+          labels: {{ month_labels|safe }},
+          datasets: [{
+              label: 'Total Profit by Invoices',
+              data: {{ profit_data|safe }},
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 2,
+              barThickness: 50
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      stepSize: 1,
+                      precision: 0
+                  }
+              }
           }
-        }
       }
-    }
   });
-  </script>
+</script>
+
 </body>
 
 </html>
