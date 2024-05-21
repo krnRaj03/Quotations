@@ -412,68 +412,74 @@ def view_single_invoice(request,invoice_id):
 def finalise_invoice(request,id):
     quote = Quote.objects.get(id=id)
     product=Product.objects.filter(quote=quote)
+    
+    try:
+        invoice=InvoiceModel.objects.get(quote=quote)
+        if invoice.quote is not None:
+            return HttpResponse("The invoice already exists!")
 
-    # Account details
-    account_options = [
-            {
-                'value': 'AZ77PAHA40060AZNHC0100067812 - AVISTA MMC',
-                'label': 'AZN',
-                'details': """AZN Account number: AZ77PAHA40060AZNHC0100067812
-                                Account name: AVISTA MMC
-                                VÖEN: 1803853771 		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan			
-                                Correspondent account: AZ82NABZ01350100000000071944 
-                                Bank S.W.I.F.T BIK: PAHAAZ22
-                                Bank VÖEN: 1700767721
-                                Bank code: 505141"""
-            },
-            {
-                'value': 'AZ68PAHA40160USDHC0100067812 - AVISTA MMC',
-                'label': 'USD',
-                'details': """USD Account of the Beneficiary: AZ68PAHA40160USDHC0100067812		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
-                                S.W.I.F.T BIK: PAHAAZ22 		
+    except:
+        # Account details
+        account_options = [
+                {
+                    'value': 'AZ77PAHA40060AZNHC0100067812 - AVISTA MMC',
+                    'label': 'AZN',
+                    'details': """AZN Account number: AZ77PAHA40060AZNHC0100067812
+                                    Account name: AVISTA MMC
+                                    VÖEN: 1803853771 		
+                                    Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan			
+                                    Correspondent account: AZ82NABZ01350100000000071944 
+                                    Bank S.W.I.F.T BIK: PAHAAZ22
+                                    Bank VÖEN: 1700767721
+                                    Bank code: 505141"""
+                },
+                {
+                    'value': 'AZ68PAHA40160USDHC0100067812 - AVISTA MMC',
+                    'label': 'USD',
+                    'details': """USD Account of the Beneficiary: AZ68PAHA40160USDHC0100067812		
+                                    Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
+                                    S.W.I.F.T BIK: PAHAAZ22 		
 
-                                Correspondent account				
-                                Account with Institution: Raiffeisen Bank International AG 
-                                Address: Am Stadtpark 9, 1030 Vienna		
-                                SWIFT BIC: RZBAATWW		
-                                Correspondent account: 70-55.081.095		
-                                Identification number: 00067812"""
-            },
-            {
-                'value': 'AZ02PAHA40160EURHC0100067812 - AVISTA MMC',
-                'label': 'EUR',
-                'details': """EUR Account of the Beneficiary: AZ02PAHA40160EURHC0100067812		
-                                Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
-                                S.W.I.F.T BIK: PAHAAZ22 		
+                                    Correspondent account				
+                                    Account with Institution: Raiffeisen Bank International AG 
+                                    Address: Am Stadtpark 9, 1030 Vienna		
+                                    SWIFT BIC: RZBAATWW		
+                                    Correspondent account: 70-55.081.095		
+                                    Identification number: 00067812"""
+                },
+                {
+                    'value': 'AZ02PAHA40160EURHC0100067812 - AVISTA MMC',
+                    'label': 'EUR',
+                    'details': """EUR Account of the Beneficiary: AZ02PAHA40160EURHC0100067812		
+                                    Beneficiary’s Bank: PASHA Bank JSC, Baku, Azerbaijan		
+                                    S.W.I.F.T BIK: PAHAAZ22 		
 
-                                Correspondent account				
-                                Account with Institution: Raiffeisen Bank International AG 
-                                Address: Am Stadtpark 9, 1030 Vienna		
-                                SWIFT BIC: RZBAATWW		
-                                Correspondent account: 1-55.081.095		
-                                Identification number: 00067812"""
-            }
-        ]
+                                    Correspondent account				
+                                    Account with Institution: Raiffeisen Bank International AG 
+                                    Address: Am Stadtpark 9, 1030 Vienna		
+                                    SWIFT BIC: RZBAATWW		
+                                    Correspondent account: 1-55.081.095		
+                                    Identification number: 00067812"""
+                }
+            ]
 
-    if request.method == 'POST':
-        bank_details = request.POST['bank_details']
-        selected_details = next((item['details'] for item in account_options if item['value'] == bank_details), "No details found.")
-        invoice_number = request.POST['invoice_number']
-        invoice_date = request.POST['date']
-        seller_name = request.POST['seller']
-        buyer_name = request.POST['buyer']
-        purchase_order = request.POST['purchase_order']
-        director_name = request.POST['director']
-
-        invoice=InvoiceModel.objects.create(invoice_number=invoice_number,quote=quote,
-                                        purchase_order=purchase_order,invoice_date=invoice_date,
-                                        bank_details=selected_details,seller_name=seller_name,
-                                        buyer_name=buyer_name,director_name=director_name)
-        invoice.save()
-        return redirect('create_invoice', id=quote.id)
-           
+        if request.method == 'POST':
+            bank_details = request.POST['bank_details']
+            selected_details = next((item['details'] for item in account_options if item['value'] == bank_details), "No details found.")
+            invoice_number = request.POST['invoice_number']
+            invoice_date = request.POST['date']
+            seller_name = request.POST['seller']
+            buyer_name = request.POST['buyer']
+            purchase_order = request.POST['purchase_order']
+            director_name = request.POST['director']
+        
+            invoice=InvoiceModel.objects.create(invoice_number=invoice_number,quote=quote,
+                                            purchase_order=purchase_order,invoice_date=invoice_date,
+                                            bank_details=selected_details,seller_name=seller_name,
+                                            buyer_name=buyer_name,director_name=director_name)
+            invoice.save()
+            return redirect('create_invoice', id=quote.id)
+            
 
     context = {"quote":quote,"product":product,"account_options": account_options}
     return render(request, "invoices/finalise_invoice.html", context)
@@ -483,6 +489,7 @@ def create_invoice(request, id):
     quote = Quote.objects.get(id=id)
     product=Product.objects.filter(quote=quote)
     invoice = InvoiceModel.objects.get(quote=quote)
+   
     bank_details_str = invoice.bank_details
     context = {"quote":quote,"product":product,"invoice":invoice,"bank_details_str":bank_details_str}
     return render(request, "invoices/create_invoice.html",context)
@@ -493,6 +500,7 @@ def invoice_pdf(request, id):
     product=Product.objects.filter(quote=quote)
     invoice = InvoiceModel.objects.get(quote=quote)
     bank_details_str = invoice.bank_details
+    
 
     for p in product:
         name=p.all_info.get('productName')
@@ -503,7 +511,7 @@ def invoice_pdf(request, id):
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{quote.quotation_number}.pdf"'
     pdfmetrics.registerFont(TTFont("Arial", "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"))
-    pdfmetrics.registerFont(TTFont("Arial-Bold", "Arial.ttf"))
+    pdfmetrics.registerFont(TTFont("Arial_Bold", "/usr/share/fonts/truetype/msttcorefonts/arialbd.ttf"))
 
     # Create PDF object
     p = canvas.Canvas(response)
@@ -525,12 +533,12 @@ def invoice_pdf(request, id):
     
     texts = [
     ("№", 2),
-    ("Sayı\nQTY\nКол-во", 22),  # x offset from the start of the rectangle
+    ("Sayı\nQTY\nКол-во", 25),  # x offset from the start of the rectangle
     ("Ölcü vahidi\nUOM\nЕдиница", 62),
     ("Malların təsviri | Description of goods | Наименование товара", 125),
     ("Qiymət\nPrice\nЦена", 380),
     ("Toplam\nTotal\nСумма", 430)
-        ]
+         ]
     x_start = 80  # Start rectangle
     y_start = 632 
     font_name = "Arial"
@@ -542,37 +550,52 @@ def invoice_pdf(request, id):
     # Calculate dimensions for rectangle
     max_height = max(text.count('\n') + 1 for text, _ in texts) * line_height
     max_width = 0
+
+    column_widths = []
     for text, offset in texts:
         width = max(p.stringWidth(line, font_name, font_size) for line in text.split('\n'))
+        column_widths.append(offset + width)  # Store the full width of each column
         max_width = max(max_width, offset + width)  # Update max width considering the offset
 
-    # Draw each block of text
+    # Calculate the starting x-coordinates for centered text
+    center_positions = []
     for text, offset in texts:
+        width = max(p.stringWidth(line, font_name, font_size) for line in text.split('\n'))
+        center_positions.append(x_start + offset + (width / 2))
+
+    # Draw each block of text centered
+    for (text, offset), center_x in zip(texts, center_positions):
         lines = text.split('\n')
         current_y = y_start
         for line in lines:
-            p.drawString(x_start + offset, current_y, line)
+            text_width = p.stringWidth(line, font_name, font_size)
+            p.drawString(center_x - (text_width /1.9), current_y, line)
             current_y -= line_height  # Decrement y to move to the next line
 
     # Draw rectangle around the content
     p.rect(x_start - 5, y_start - max_height, max_width + 10, max_height + 12, stroke=1, fill=0)
 
+    # Draw vertical separators
+    for i, width in enumerate(column_widths[:-1]):  # Exclude the last column since we don't need a separator after it
+        separator_x = x_start + width + 1  # +2 for some padding
+        p.line(separator_x, y_start - max_height, separator_x, y_start + 12)
+
     # Products
     y = 570
-    font_size = 10
-    p.setFont("Arial-Bold", font_size)  
+    font_size = 8.5
+    p.setFont("Arial", font_size)  
     for i, prod in enumerate(product):
         p.drawString(85, y, str(i + 1)+".")
         p.drawString(110, y, prod.all_info['quantity'])
         p.drawString(150, y, prod.all_info['uom'])
-        p.drawString(208, y, prod.all_info['productName'])
+        p.drawString(198, y, prod.all_info['productName'])
         p.drawString(460, y, prod.all_info['price'])
-        p.drawString(510, y, prod.all_info['total'])
+        p.drawString(507, y, prod.all_info['total'])
         y -= 18  # Move to the next line
     y -= 5 
 
     font_size =10
-    p.setFont("Arial-Bold", font_size)
+    p.setFont("Arial_Bold", font_size)
     p.drawString(80, y, "Şərtlər | Terms | Условие:"+"                 "+"Rate: 1.00€ = ")
     y -= 15
 
@@ -583,7 +606,7 @@ def invoice_pdf(request, id):
     p.drawString(298,y,"50% in advance, 50% before shipping")
     y -= 6
 
-    #horizontal line
+    #Horizontal line
     x_start = 80  
     x_end = 550   
     y_position = y  
@@ -594,7 +617,7 @@ def invoice_pdf(request, id):
     y -= 12
     p.drawString(350, y, "ƏDV | VAT | НДС:" + "        "+ str(quote.vat)+"%")
     y -= 12
-    p.setFont("Arial-Bold", 9)
+    p.setFont("Arial_Bold", 9)
     p.drawString(314, y, "ÜMUMİ | TOTAL | ВСЕГО:"+"        "+ str(quote.total_price))
     y -= 8
 
@@ -605,12 +628,12 @@ def invoice_pdf(request, id):
     p.line(x_start, y_position, x_end, y_position)
     y -= 20
 
-    p.setFont("Arial-Bold", 12)
+    p.setFont("Arial_Bold", 10)
     p.drawString(80, y, "BANK REKVIZITLƏRİ | BANK DETAILS | РЕКВИЗИТЫ СЧЁТА:")
-    y -= 10
+    y -= 5
 
     details_list = bank_details_str.split('                          ')
-    y -= 8  
+    y -= 10  
     
     p.setFont("Arial", 9)
     for detail in details_list:
@@ -618,12 +641,11 @@ def invoice_pdf(request, id):
         if detail: 
             p.drawString(80, y, detail)
             y -= 12  
+            
 
-    p.setFont("Arial", 9)
-    p.drawString(80,y,invoice.bank_details)
-    y -= 40
+    y -=20
 
-    p.setFont("Arial-Bold", 12)
+    p.setFont("Arial_Bold", 10)
     p.drawString(80, y, "AVISTA LLC")
     y-= 10
     p.setFont("Arial", 10)
@@ -632,25 +654,24 @@ def invoice_pdf(request, id):
     p.drawString(80, y, invoice.director_name)
 
 
-
     # Main Header
     p.setFont("Arial", 10)
     p.drawString(60, 800, "www.bakustock.com")
     p.drawString(60, 788, "Tel: 050 406 30 77")
 
-    p.setFont("Arial-Bold", 14)
+    p.setFont("Arial_Bold", 14)
     p.drawString(250, 800, "AVISTA LLC")
 
     p.setFont("Arial", 10)
     p.drawString(400, 800, "E-mail: avista@bakustock.com")
     p.drawString(400, 788, "E-mail: avista.mmc@gmail.com")
 
-    p.setFont("Arial-Bold", 14)
-    p.drawString(80, 740, "HESAB FAKTURA | INVOICE | СЧЁТ ФАКТУРА")
+    p.setFont("Arial_Bold", 12)
+    p.drawString(74, 740, "HESAB FAKTURA | INVOICE | СЧЁТ ФАКТУРА")
 
     p.showPage()
     p.save()
-    print("PDF created")
+    
     return response
 
 
